@@ -1,0 +1,638 @@
+<!--
+
+TODO
+
+add ??? dropdown, 1px dashed border
+explain this auction is for x time, bids extend by x, bids must increase by x%
+
+
+ -->
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="">
+  <meta name="keywords" content="steviep, steve pikelny, pikelny, crypto, ethereum, bitcoin">
+
+  <meta name="twitter:image" content="https://steviep.xyz/">
+  <meta name="twitter:image:alt" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@steviepxyz">
+  <meta name="twitter:site" content="@steviepxyz">
+  <meta property="twitter:description" content="">
+
+  <meta name="og:image" property="og:image" content="https://steviep.xyz/">
+  <meta name="og:image:alt" content="">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://steviep.xyz/">
+  <meta property="og:title" content="">
+  <meta property="og:site_name" content="">
+  <meta property="og:description" content="">
+
+  <link rel="stylesheet" type="text/css" href="./styles.css">
+
+
+  <style type="text/css">
+    * {
+      font-family: sans-serif;
+    }
+
+    header {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.25em;
+      margin-bottom: 1em;
+      max-width: 1500px;
+      margin: auto;
+    }
+
+    .aboveFold, .lastUpdatedSection, footer {
+      max-width: 600px;
+      margin: auto;
+      padding: 0 1em;
+    }
+
+
+    footer {
+      padding-top: 1em;
+      padding-bottom: 1em;
+      text-align: center;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0.5em 0;
+      font-size: 4em;
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 3em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.9em;
+      }
+    }
+
+    .address {
+      font-family: monospace;
+    }
+
+    #connectWalletSection {
+      display: flex;
+      justify-content: center;
+    }
+
+    #connectedAs {
+      font-size: 1.25em;
+    }
+    #lastUpdated, #connectedAs, #connectedBalance, #connectedNetwork {
+      font-family: monospace;
+    }
+
+    .connectionSection {
+      padding: 0.5em;
+    }
+
+    .connectButton {
+      font-size: 1em;
+      padding: 0.5em 1em;
+      cursor: pointer;
+    }
+
+    #connectedAs {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 100%;
+    }
+
+
+    button {
+      cursor: pointer;
+      background: #000;
+      color: #fff;
+      border: 1px solid;
+      transition: 150ms;
+    }
+
+    button:hover {
+      background: #fff;
+      color: #000;
+    }
+
+
+
+
+    .label {
+      text-transform: uppercase;
+      font-size: 0.75em;
+      font-weight: bold;
+    }
+
+
+    @media (max-width: 370px) {
+      .address {
+        font-size: 0.85em;
+      }
+    }
+
+
+
+    .nightmode * {
+      color: #fff;
+    }
+    body.nightmode {
+      background: #000;
+    }
+    .nightmode input {
+      color: #000;
+    }
+    .nightmode a, .nightmode #question {
+      color: #00a7ff;
+    }
+
+
+    .grid {
+      margin: auto;
+      padding: 1em;
+      max-width: 1500px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 1vw;
+      row-gap: 0.6vw;
+    }
+
+    .grid img {
+      width: 100%;
+    }
+
+    @media (max-width: 1100px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        max-width: 1000px;
+      }
+    }
+
+
+    @media (max-width: 500px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    img {
+      border: 1px solid;
+    }
+
+    .infoCard {
+      background: #fff;
+      display: inline-block;
+      transform: translate(1px, calc(-100% - 5px));
+      padding: 0.5em;
+      opacity: 0.7;
+    }
+
+    .infoCard {
+      color: #000;
+    }
+
+    .nightmode .infoCard {
+      background: #000;
+    }
+    .nightmode .infoCard {
+      color: #fff;
+    }
+
+
+    .auctionPanel:hover .infoCard {
+      background: #000;
+      color: #fff;
+    }
+
+    .nightmode .auctionPanel:hover .infoCard {
+      background: #fff;
+    }
+    .nightmode .auctionPanel:hover .infoCard * {
+      color: #000;
+    }
+
+
+
+    .auctionInfo {
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+
+
+
+
+    .auctionPanel img {
+      border-color: #000;
+    }
+
+    .nightmode .auctionPanel img {
+      border-color: #fff;
+    }
+
+    p {
+      margin-bottom: 0.5em;
+      text-align: justify;
+    }
+
+    code {
+      font-family: monospace;
+      text-align: center;
+      display: block;
+      margin-bottom: 0.5em;
+    }
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <connect-wallet id="wallet-connect" class="connectionSection">
+      <section slot="notConnected">
+        <connect-button>
+          <button slot="button" class="connectButton">Connect Wallet</button>
+          <div slot="loading">Loading...</div>
+          <div slot="error" class="error"></div>
+        </connect-button>
+      </section>
+
+
+      <section slot="connected">
+        <section>
+          <h3 class="label">CONNECTED AS: <span id="connectedAs"></span></h3>
+          <div id="connectedBalance"></div>
+          <div id="connectedNetwork"></div>
+        </section>
+      </section>
+    </connect-wallet>
+  </header>
+
+  <main>
+    <div class="aboveFold">
+      <h1>COLD HARD CASH</h1>
+      <p>Each Cold Hard Cash (CASH) token represents an option on the mailing of the physical currency represented in each token thumbnail. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. In addition, the Artist shall make a good faith effort to store all physical currency, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
+      <p>The reserve price of each auction is based on the following calculation:</p>
+      <code>ETHUSD * ($U + ($L + $G)/16)</code>
+      <p>Where</p>
+      <code>ETHUSD = The ETH/USD exchange rate as of x/x/xx</code>
+      <code>$U = The nominal value of each piece of physical currency</code>
+      <code>$L = X hours of labor * NYS minimum wage</code>
+      <code>$G = the gas costs of uploading the contract + setting up the auctions</code>
+      <div style="display: flex; justify-content: center;">
+        <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow">Etherscan</a></h3>
+        <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow">OpenSea</a></h3>
+      </div>
+    </div>
+
+
+
+    <section id="grid" class="grid">
+
+
+    </section>
+
+
+
+    <connect-wallet id="wallet-connect">
+      <section slot="connected" class="center" style="text-align: left;">
+
+        <section class="bidSection lastUpdatedSection">
+          <h3 class="label">DATA LAST UPDATED:</h3>
+          <div id="lastUpdated"></div>
+        </section>
+      </section>
+    </connect-wallet>
+
+
+  </main>
+
+  <footer><a href="https://steviep.xyz" target="_blank">steviep.xyz</a> (c) 2023</footer>
+</body>
+
+<script src="./$.js"></script>
+<script src="./webComponents.js"></script>
+<script src="./web3Components.js"></script>
+<script src="./connectWallet.js"></script>
+<script src="./min.ethers.js"></script>
+
+<script type="text/javascript">
+
+
+  const auctions = [
+    { title: '$0.00', auctionId: 0, url: './auctions/0', img: './assets/0.jpg' },
+    { title: '$0.01', auctionId: 1, url: './auctions/1', img: './assets/1.jpg' },
+    { title: '$0.05', auctionId: 2, url: './auctions/2', img: './assets/5.jpg' },
+    { title: '$0.10', auctionId: 3, url: './auctions/3', img: './assets/10.jpg' },
+    { title: '$0.25', auctionId: 4, url: './auctions/4', img: './assets/25.jpg' },
+    { title: '$0.50', auctionId: 5, url: './auctions/5', img: './assets/50.jpg' },
+    { title: '$1.00', auctionId: 6, url: './auctions/6', img: './assets/100.jpg' },
+    { title: '$2.00', auctionId: 7, url: './auctions/7', img: './assets/200.jpg' },
+    { title: '$5.00', auctionId: 8, url: './auctions/8', img: './assets/500.jpg' },
+    { title: '$6.79', auctionId: 9, url: './auctions/9', img: './assets/679.jpg' },
+    { title: '$10.00', auctionId: 10, url: './auctions/10', img: './assets/1000.jpg' },
+    { title: '$20.00', auctionId: 11, url: './auctions/11', img: './assets/2000.jpg' },
+    { title: '$50.00', auctionId: 12, url: './auctions/12', img: './assets/5000.jpg' },
+    { title: '$50.32', auctionId: 13, url: './auctions/13', img: './assets/5032.jpg' },
+    { title: '$100.00', auctionId: 14, url: './auctions/14', img: './assets/10000.jpg' },
+    { title: '$???.??', auctionId: 15, url: './auctions/15', img: './assets/mystery.jpg' },
+  ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  const provider = new Web3Provider()
+  mountComponents(
+    ConnectWallet(provider, 'connectWallet'),
+    ConnectButton(provider),
+  )
+
+  const network = 'local'
+
+  const STEVIEP_AUCTION = {
+    local: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+  }[network]
+
+  const UNISWAP_V2 = {
+    local: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
+    mainnet: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+  }[network]
+
+
+  const auctionStruct = `(bool tokenExists, uint256 duration, uint256 bidIncreaseBps, uint256 bidTimeExtension, uint256 minBid, uint256 tokenId, uint256 startTime, address beneficiary, address minterContract, address rewardContract, address allowListContract, bool isSettled)`
+
+  const auctionABI = [
+    'event BidMade(uint256 indexed auctionId, address indexed bidder, uint256 amount, uint256 timestamp)',
+    'function auctionCount() external view returns (uint256)',
+    'function auctionIdToHighestBid(uint256) external view returns (uint256 amount, uint256 timestamp, address bidder)',
+    'function auctionEndTime(uint256) external view returns (uint256 endTime)',
+    `function auctionIdToAuction(uint256) external view returns (${auctionStruct})`,
+    'function isActive(uint256 auctionId) external view returns (bool)',
+    'function bid(uint256 auctionId) external payable',
+    'function settle(uint256 auctionId) external payable',
+  ]
+
+  const uniswapV2ABI = [
+    'function getReserves() external view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)'
+  ]
+
+  const rawSteviepAuction = provider.rawContract(STEVIEP_AUCTION, auctionABI)
+
+
+
+
+
+
+
+
+
+
+  const $grid = $.id('grid')
+  const $lastUpdated = $.id('lastUpdated')
+  const $connectedAs = $.id('connectedAs')
+  const $connectedBalance = $.id('connectedBalance')
+  const $connectedNetwork = $.id('connectedNetwork')
+
+
+
+
+  $grid.innerHTML = auctions.map(a => `
+    <div class="auctionPanel">
+      <a href="${a.url}">
+        <img src="${a.img}">
+        <div style="height: 0">
+          <div class="infoCard">
+            <h3>${a.title}</h3>
+            <h3 class="auctionInfo" id="timeLeft-${a.auctionId}"></h3>
+            <h3 class="auctionInfo" id="highestBid-${a.auctionId}"></h3>
+          </div>
+        </div>
+      </a>
+    </div>
+  `).join('')
+
+
+
+
+
+  const activeCountdownIntervals = {}
+
+  async function updateBidInfo(signer, steviepAuction) {
+
+    const signerAddr = await signer.getAddress()
+
+    const [
+      blockNumber,
+      formattedAddr,
+      connectedBalance,
+      connectedNetwork
+    ] = await Promise.all([
+      provider.provider.getBlockNumber(),
+      formatAddr(signerAddr, provider),
+      provider.getETHBalance(signerAddr),
+      provider.getNetwork()
+    ])
+
+    const blockTimestamp = (await provider.provider.getBlock(blockNumber)).timestamp
+    const timeDiff = Date.now() - blockTimestamp*1000
+
+
+    auctions.forEach(async a => {
+      const [
+        highestBid,
+        auction,
+        auctionEndTime,
+        isActive,
+      ] = await Promise.all([
+        steviepAuction.auctionIdToHighestBid(a.auctionId),
+        steviepAuction.auctionIdToAuction(a.auctionId),
+        steviepAuction.auctionEndTime(a.auctionId),
+        steviepAuction.isActive(a.auctionId),
+      ])
+
+      const reservePrice = ethVal(auction.minBid)
+      const hasBid = !!bnToN(highestBid.timestamp)
+      const bidAmount = ethVal(highestBid.amount)
+
+
+      if (!bidAmount) {
+        $.id(`highestBid-${a.auctionId}`).innerHTML = `Reserve: ${reservePrice} ETH`
+      } else if (isActive) {
+        $.id(`highestBid-${a.auctionId}`).innerHTML = `Highest Bid: ${bidAmount} ETH`
+
+
+        const timeLeft = bnToN(auctionEndTime)*1000 - Date.now()
+
+        if (activeCountdownIntervals[a.auctionId]) activeCountdownIntervals[a.auctionId]()
+        activeCountdownIntervals[a.auctionId] = triggerTimer(timeLeft, $.id(`timeLeft-${a.auctionId}`))
+
+        // show highest bid, countdown
+      } else {
+        $.id(`highestBid-${a.auctionId}`).innerHTML = `Sold for: ${bidAmount} ETH`
+        // show winning info
+      }
+    })
+
+
+
+
+
+
+
+
+
+
+
+    $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]`
+
+    $connectedAs.innerHTML = `<a href="https://etherscan.io/address/${signerAddr}" target="_blank" class="address">${
+      isENS(formattedAddr) ? formattedAddr : await formatAddr(signerAddr, provider)
+    }</a>`
+    $connectedBalance.innerHTML = `Balance: ${ethVal(connectedBalance)} ETH`
+
+    let networkName, networkDescriptor
+    if (connectedNetwork.name && connectedNetwork.name !== 'unknown') {
+      networkName = connectedNetwork.chainId === 1 ? 'mainnet' : connectedNetwork.name
+      networkDescriptor = 'Network'
+    } else {
+      networkName = connectedNetwork.chainId
+      networkDescriptor = 'Network ID'
+    }
+
+    $connectedNetwork.innerHTML = `${networkDescriptor}: ${networkName}`
+
+  }
+
+  provider.onConnect(async () => {
+    const steviepAuction = await provider.contract(STEVIEP_AUCTION, auctionABI)
+    const uniswapV2 = await provider.contract(UNISWAP_V2, uniswapV2ABI)
+    const rawSteviepAuction = provider.rawContract(STEVIEP_AUCTION, auctionABI)
+
+    setRunInterval(() => updateBidInfo(provider.signer, steviepAuction, uniswapV2), 3000)
+
+  })
+
+
+
+
+  async function getEthUsd(uniswapV2) {
+    const decimals = 2
+    const { _reserve0, _reserve1 } = await uniswapV2.getReserves()
+    return _reserve0.mul(1000000000000).mul(10**decimals).div(_reserve1).toNumber() / 10**decimals
+  }
+
+
+
+
+  function formatMinBid(amt) {
+    return Math.ceil(amt * 1000) / 1000
+  }
+
+  function isENS(ens) {
+    return ens.slice(-4) === '.eth'
+  }
+  async function formatAddr(addr, provider, truncate=true) {
+    try {
+      const ens = await provider.getENS(addr)
+      if (ens.slice(-4) === '.eth') {
+        return ens.length > 10
+          ? ens.slice(0, 10) + '...'
+          : ens
+      } else {
+        return truncate ? truncateAddr(addr) : addr
+      }
+    } catch (e) {
+      return truncate ? truncateAddr(addr) : addr
+    }
+  }
+
+
+  function unhide(element) {
+    $(element, 'display', '')
+  }
+
+  function hide(element) {
+    $(element, 'display', 'none')
+  }
+
+  function setRunInterval(fn, ms, i=0) {
+    const run = () => {
+      fn(i)
+      i++
+    }
+
+    run()
+
+    let isCleared = false
+
+    let interval = setInterval(run, ms)
+
+    const newInterval = (ms) => {
+      if (isCleared) return
+      clearInterval(interval)
+      interval = setInterval(run, ms)
+    }
+
+    const stopInterval = () => {
+      if (!isCleared) {
+        clearInterval(interval)
+        isCleared = true
+      }
+    }
+    return stopInterval
+  }
+
+  function triggerTimer(timeLeft, $elem) {
+    const with0 = x => x < 10 ? '0' + Math.floor(x) : Math.floor(x)
+    let timeLeftCounter = timeLeft
+    return setRunInterval(() => {
+      timeLeftCounter = Math.max(timeLeftCounter - 1000, 0)
+      const days = timeLeftCounter / (24*60*60*1000)
+      const hours = 24 * (days%1)
+      const minutes = 60 * (hours%1)
+      const seconds = Math.floor(60 * (minutes%1))
+      const ms = Math.floor(timeLeftCounter % 1000 / 100) % 10
+
+      $elem.innerHTML = `${Math.floor(days)}:${with0(hours)}:${with0(minutes)}:${with0(seconds)}`
+    }, 1000)
+  }
+
+</script>
+
+
+
+<script type="text/javascript">
+  var hours = new Date().getHours();
+  if (hours <= 5 || hours >= 22) document.body.className = 'nightmode';
+</script>
+</html>

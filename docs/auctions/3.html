@@ -1,0 +1,174 @@
+<!--
+
+TODO
+
+add ??? dropdown, 1px dashed border
+explain this auction is for x time, bids extend by x, bids must increase by x%
+
+
+ -->
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="">
+  <meta name="keywords" content="steviep, steve pikelny, pikelny, crypto, ethereum, bitcoin">
+
+  <meta name="twitter:image" content="https://steviep.xyz/">
+  <meta name="twitter:image:alt" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@steviepxyz">
+  <meta name="twitter:site" content="@steviepxyz">
+  <meta property="twitter:description" content="">
+
+  <meta name="og:image" property="og:image" content="https://steviep.xyz/">
+  <meta name="og:image:alt" content="">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://steviep.xyz/">
+  <meta property="og:title" content="">
+  <meta property="og:site_name" content="">
+  <meta property="og:description" content="">
+
+  <link rel="stylesheet" type="text/css" href="../styles.css">
+  <link rel="stylesheet" type="text/css" href="./auction-styles.css">
+
+</head>
+
+<body>
+  <header><h2><a href="../">Cold Hard Cash</a></h2></header>
+  <main>
+    <div class="imgContainer">
+      <img src="../assets/10.jpg">
+    </div>
+
+    <h1>$0.10</h1>
+
+
+    <connect-wallet id="wallet-connect">
+      <section slot="noWeb3">
+        <h2 class="error center">Please visit this website in a web3-connected browser</h2>
+      </section>
+
+      <section slot="notConnected">
+        <section id="connectWalletSection" class="bidSection">
+          <connect-button>
+            <button slot="button">Connect Wallet</button>
+            <div slot="loading">Loading...</div>
+            <div slot="error" class="error"></div>
+          </connect-button>
+        </section>
+      </section>
+
+      <section slot="connected">
+        <section class="bidSection">
+          <h3 class="label">CONNECTED AS:</h3>
+          <div id="connectedAs1"></div>
+          <div id="connectedAs2"></div>
+          <div id="connectedBalance"></div>
+          <div id="connectedNetwork"></div>
+        </section>
+
+        <section id="activeBidSection" class="bidSection" style="display: none;">
+          <section id="highestBidSection" style="display: none;">
+            <div class="label" id="highestBidLabel">HIGHEST BID</div>
+            <div id="highestBidAmount"></div>
+            <div id="highestBidder"></div>
+          </section>
+
+          <section id="timeLeftSection" style="display: none;">
+            <h3 class="label">TIME LEFT (ESTIMATED)</h3>
+            <div id="timeLeft"></div>
+            <div id="timeDiff"></div>
+          </section>
+
+        </section>
+
+        <section id="makeBidSection" class="bidSection" style="display: none;">
+          <div id="bidSectionContent">
+            <input id="newBidAmount" placeholder="ETH" type="number" step="0.1">
+            <button id="submitBid">Bid</button>
+          </div>
+          <div id="biddingHelp">
+            <div class="center" style="margin-top: 0.5em;">
+              <div id="question">???</div>
+              <div id="answer" style="display: none">
+                <div style="display: flex; justify-content: end;">
+                  <div id="answerX" style="padding: 0.25em">X</div>
+                </div>
+                <div id="answerContent">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="bidSectionError" class="error"></div>
+          <div id="bidSectionLoading" style="display: none;">
+            <div id="bidSectionLoadingMessage"></div>
+          </div>
+        </section>
+
+        <section id="settlementSection" class="bidSection" style="display: none;">
+          <div id="settlementSectionContent">
+            <button id="submitSettlement">Settle</button>
+          </div>
+          <div id="settlementSectionError" class="error"></div>
+          <div id="settlementSectionLoading" style="display: none;">
+            <div id="settlementSectionLoadingMessage"></div>
+          </div>
+        </section>
+      </section>
+    </connect-wallet>
+
+      <p>Each Cold Hard Cash (CASH) token represents an option on the mailing of the physical currency represented in each token thumbnail. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. In addition, the Artist shall make a good faith effort to store all physical currency, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
+      <p>The reserve price of each auction is based on the following calculation:</p>
+      <code>ETHUSD * ($U + ($L + $G)/16)</code>
+      <p>Where</p>
+      <code>ETHUSD = The ETH/USD exchange rate as of x/x/xx</code>
+      <code>$U = The nominal value of each piece of physical currency</code>
+      <code>$L = X hours of labor * NYS minimum wage</code>
+      <code>$G = the gas costs of uploading the contract + setting up the auctions</code>
+
+    <connect-wallet id="wallet-connect">
+      <section slot="connected">
+        <section id="bidHistory" class="bidSection" style="display: none;">
+          <h3 class="label">Previous Bids</h3>
+          <ul id="previousBidList"></ul>
+        </section>
+
+        <section class="bidSection">
+          <h3 class="label">DATA LAST UPDATED:</h3>
+          <div id="lastUpdated"></div>
+        </section>
+      </section>
+    </connect-wallet>
+
+
+  </main>
+
+  <footer><a href="https://steviep.xyz" target="_blank">steviep.xyz</a> (c) 2023</footer>
+</body>
+
+<script src="../$.js"></script>
+<script src="../webComponents.js"></script>
+<script src="../web3Components.js"></script>
+<script src="../connectWallet.js"></script>
+<script src="../min.ethers.js"></script>
+
+<script type="text/javascript">
+  const AUCTION_ID = 3
+</script>
+<script src="./auction.js"></script>
+
+
+<script type="text/javascript">
+  var hours = new Date().getHours();
+  if (hours <= 5 || hours >= 22) document.body.className = 'nightmode';
+</script>
+</html>
