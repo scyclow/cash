@@ -14,7 +14,7 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
 <html>
 <head>
   <meta charset="utf-8">
-  <title></title>
+  <title>Cold Hard Cash</title>
   <link rel="shortcut icon" type="image/x-icon" href="./favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -213,10 +213,17 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
       color: #fff;
     }
 
+    .auctionPanel:hover {
+      opacity: 0.9;
+    }
 
     .auctionPanel:hover .infoCard {
       background: #000;
       color: #fff;
+    }
+
+    .auctionPanel.endingSoon img {
+      border: 2px solid #c40000;
     }
 
     .nightmode .auctionPanel:hover .infoCard {
@@ -380,21 +387,38 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
   const network = 'local'
 
   const STEVIEP_AUCTION = {
+    // local: '0x46d4674578a2daBbD0CEAB0500c6c7867999db34'
     local: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
   }[network]
 
   const UNISWAP_V2 = {
+    // local: '0xC220Ed128102d888af857d137a54b9B7573A41b2',
     local: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
     mainnet: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
   }[network]
 
 
-  const auctionStruct = `(bool tokenExists, uint256 duration, uint256 bidIncreaseBps, uint256 bidTimeExtension, uint256 minBid, uint256 tokenId, uint256 startTime, address beneficiary, address minterContract, address rewardContract, address allowListContract, bool isSettled)`
+  const auctionStruct = `(
+    bool tokenExists,
+    uint256 duration,
+    uint256 bidIncreaseBps,
+    uint256 bidTimeExtension,
+    uint256 minBid,
+    uint256 tokenId,
+    uint256 startTime,
+    address beneficiary,
+    bool approveFutureTransfer,
+    address minterContract,
+    address rewardContract,
+    address allowListContract
+  )`
+
+  const bidStruct = `(uint128 amount, uint128 timestamp, address bidder)`
 
   const auctionABI = [
     'event BidMade(uint256 indexed auctionId, address indexed bidder, uint256 amount, uint256 timestamp)',
     'function auctionCount() external view returns (uint256)',
-    'function auctionIdToHighestBid(uint256) external view returns (uint256 amount, uint256 timestamp, address bidder)',
+    `function auctionIdToHighestBid(uint256) external view returns (${bidStruct})`,
     'function auctionEndTime(uint256) external view returns (uint256 endTime)',
     `function auctionIdToAuction(uint256) external view returns (${auctionStruct})`,
     'function isActive(uint256 auctionId) external view returns (bool)',
@@ -426,8 +450,9 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
 
 
 
-  $grid.innerHTML = auctions.map(a => `
-    <div class="auctionPanel">
+  $grid.innerHTML = auctions
+  .map(a => `
+    <div class="auctionPanel" id="auctionPanel-${a.auctionId}">
       <a href="${a.url}">
         <img src="${a.img}">
         <div style="height: 0">
@@ -463,11 +488,12 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
       provider.getNetwork()
     ])
 
-    const blockTimestamp = (await provider.provider.getBlock(blockNumber)).timestamp
-    const timeDiff = Date.now() - blockTimestamp*1000
+    const block = await provider.provider.getBlock(blockNumber)
+    const timeDiff = Date.now() - block.timestamp*1000
 
+    const timeLeftList = []
 
-    auctions.forEach(async a => {
+    for (let a of auctions) {
       const [
         highestBid,
         auction,
@@ -482,38 +508,52 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
 
       const reservePrice = ethVal(auction.minBid)
       const hasBid = !!bnToN(highestBid.timestamp)
-      const bidAmount = ethVal(highestBid.amount)
 
+      const bidAmount = ethVal(highestBid.amount)
+      const timeLeft = bnToN(auctionEndTime)*1000 - Date.now()
+
+      const endingSoon = timeLeft < auction.bidTimeExtension*1000 && timeLeft > 0 && isActive
+
+      timeLeftList.push({timeLeft, endingSoon, isActive, auctionId: a.auctionId})
+
+      const $highestBid = $.id(`highestBid-${a.auctionId}`)
+      const $timeLeft = $.id(`timeLeft-${a.auctionId}`)
 
       if (!bidAmount) {
-        $.id(`highestBid-${a.auctionId}`).innerHTML = `Reserve: ${reservePrice} ETH`
+        $highestBid.innerHTML = `Reserve: ${reservePrice} ETH`
       } else if (isActive) {
-        $.id(`highestBid-${a.auctionId}`).innerHTML = `Highest Bid: ${bidAmount} ETH`
-
-
-        const timeLeft = bnToN(auctionEndTime)*1000 - Date.now()
-
+        $highestBid.innerHTML = `Highest Bid: ${bidAmount} ETH` + (endingSoon ? ' [ENDING SOON]' : '')
         if (activeCountdownIntervals[a.auctionId]) activeCountdownIntervals[a.auctionId]()
-        activeCountdownIntervals[a.auctionId] = triggerTimer(timeLeft, $.id(`timeLeft-${a.auctionId}`))
 
-        // show highest bid, countdown
+        activeCountdownIntervals[a.auctionId] = triggerTimer(timeLeft, $timeLeft)
+
       } else {
-        $.id(`highestBid-${a.auctionId}`).innerHTML = `Sold for: ${bidAmount} ETH`
-        // show winning info
+        $highestBid.innerHTML = `Sold for: ${bidAmount} ETH`
       }
-    })
+    }
+
+    const auctionsBidOn = ls.get('__AUCTIONS_BID_ON__') || {}
+
+    timeLeftList
+      .sort((a, b) => {
+        if (b.endingSoon && !a.endingSoon) return 1
+        if (a.endingSoon && !b.endingSoon) return -1
+        if (a.isActive && !b.isActive) return -1
+        if (b.isActive && !a.isActive) return 1
+        if (!a.isActive && !b.isActive) return 0
+        if (!a.isActive || auctionsBidOn[b.auctionId]) return 1
+        if (!b.isActive || auctionsBidOn[a.auctionId]) return -1
+        return b - a
+      })
+      .forEach((auction, i) => {
+        const panel = $.id(`auctionPanel-${auction.auctionId}`)
+        $(panel, 'order', i)
+
+        if (auction.endingSoon) panel.classList.add('endingSoon')
+      })
 
 
-
-
-
-
-
-
-
-
-
-    $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]`
+    $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(block.timestamp*1000)}<br>[Block: ${blockNumber}]`
 
     $connectedAs.innerHTML = `<a href="https://etherscan.io/address/${signerAddr}" target="_blank" class="address">${
       isENS(formattedAddr) ? formattedAddr : await formatAddr(signerAddr, provider)

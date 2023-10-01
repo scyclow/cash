@@ -3,6 +3,8 @@ const ethVal = n => Number(ethers.utils.formatEther(n))
 const truncateAddr = addr => addr.slice(0, 6) + '...' + addr.slice(-4)
 const toETH = amt => ethers.utils.parseEther(String(amt))
 const ethValue = amt => ({ value: toETH(amt) })
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+
 
 class Web3Provider {
   onConnectCbs = []

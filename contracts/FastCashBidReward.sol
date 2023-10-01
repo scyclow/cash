@@ -2,8 +2,6 @@
 
 // contract by steviep.eth
 
-import "hardhat/console.sol";
-
 pragma solidity ^0.8.17;
 
 interface IFastCashMoneyPlus {
@@ -26,9 +24,12 @@ contract FastCashBidReward {
     require(msg.sender == minter);
     if (fastCash.balanceOf(address(this)) >= 1 ether) {
       fastCash.transfer(recipient, 1 ether);
-      console.log(fastCash.balanceOf(recipient));
     }
+  }
 
+  function withdraw(uint256 amount) external {
+    require(msg.sender == owner);
+    fastCash.transfer(msg.sender, amount);
   }
 
   function setMinter(address newMinter) external {

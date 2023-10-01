@@ -25,43 +25,34 @@ async function main() {
   AllowListMock = await AllowListMockFactory.deploy()
   await AllowListMock.deployed()
 
+
   const UniswapV2MockFactory = await ethers.getContractFactory('UniswapV2Mock', admin)
   UniswapV2Mock = await UniswapV2MockFactory.deploy()
   await UniswapV2Mock.deployed()
 
-  await SteviepAuction.connect(admin).create(
-    false,
-    ONE_DAY,
-    1000,
-    TEN_MINUTES,
-    '100000000000000000',
-    1,
-    admin.address,
-    MinterMock.address,
-    RewardMinterMock.address,
-    ZERO_ADDR,
-  )
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 16; i++) {
     await SteviepAuction.connect(admin).create(
       false,
-      30,
+      300,
       1000,
-      12,
+      300,
       '100000000000000000',
       1,
       admin.address,
+      false,
       MinterMock.address,
       RewardMinterMock.address,
-      ZERO_ADDR,
+      AllowListMock.address,
     )
   }
+  await AllowListMock.connect(admin).setBalance(admin.address, 1)
 
-  console.log((await SteviepAuction.connect(admin).auctionIdToAuction(0)).minBid)
 
   console.log(`SteviepAuction:`, SteviepAuction.address)
   console.log(`MinterMock:`, MinterMock.address)
   console.log(`UniswapV2Mock:`, UniswapV2Mock.address)
+  console.log(`AllowListMock:`, AllowListMock.address)
   console.log('admin:', admin.address)
 }
 

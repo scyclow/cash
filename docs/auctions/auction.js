@@ -7,18 +7,32 @@ mountComponents(
 
 const network = 'local'
 
-const STEVIEP_AUCTION = {
-  // local: '0x46d4674578a2daBbD0CEAB0500c6c7867999db34'
-  local: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
-}[network]
+  const STEVIEP_AUCTION = {
+    // local: '0x46d4674578a2daBbD0CEAB0500c6c7867999db34'
+    local: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+  }[network]
 
-const UNISWAP_V2 = {
-  local: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
-  mainnet: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
-}[network]
+  const UNISWAP_V2 = {
+    // local: '0xC220Ed128102d888af857d137a54b9B7573A41b2',
+    local: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
+    mainnet: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+  }[network]
 
 
-const auctionStruct = `(bool tokenExists, uint256 duration, uint256 bidIncreaseBps, uint256 bidTimeExtension, uint256 minBid, uint256 tokenId, uint256 startTime, address beneficiary, address minterContract, address rewardContract, address allowListContract, bool isSettled)`
+const auctionStruct = `(
+  bool tokenExists,
+  uint256 duration,
+  uint256 bidIncreaseBps,
+  uint256 bidTimeExtension,
+  uint256 minBid,
+  uint256 tokenId,
+  uint256 startTime,
+  address beneficiary,
+  bool approveFutureTransfer,
+  address minterContract,
+  address rewardContract,
+  address allowListContract
+)`
 
 const auctionABI = [
   'event BidMade(uint256 indexed auctionId, address indexed bidder, uint256 amount, uint256 timestamp)',
@@ -27,13 +41,19 @@ const auctionABI = [
   'function auctionEndTime(uint256) external view returns (uint256 endTime)',
   `function auctionIdToAuction(uint256) external view returns (${auctionStruct})`,
   'function isActive(uint256 auctionId) external view returns (bool)',
-  'function bid(uint256 auctionId) external payable',
+  'function isSettled(uint256 auctionId) external view returns (bool)',
+  'function bid(uint256 auctionId, bool wantsReward) external payable',
   'function settle(uint256 auctionId) external payable',
 ]
 
 const uniswapV2ABI = [
   'function getReserves() external view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)'
 ]
+
+const allowListContractABI = [
+  'function balanceOf(address) external view returns (uint256)'
+]
+
 
 const rawSteviepAuction = provider.rawContract(STEVIEP_AUCTION, auctionABI)
 
@@ -62,6 +82,7 @@ const $highestBidder = $.id('highestBidder')
 const $bidHistory = $.id('bidHistory')
 const $previousBidList = $.id('previousBidList')
 const $highestBidLabel = $.id('highestBidLabel')
+const $bidderSecondaryInfo = $.id('bidderSecondaryInfo')
 
 const $settlementSection = $.id('settlementSection')
 const $settlementSectionContent = $.id('settlementSectionContent')
@@ -100,6 +121,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     auction,
     auctionEndTime,
     isActive,
+    isSettled,
     blockNumber,
     formattedAddr,
     unsortedBidsMade,
@@ -111,6 +133,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     steviepAuction.auctionIdToAuction(AUCTION_ID),
     steviepAuction.auctionEndTime(AUCTION_ID),
     steviepAuction.isActive(AUCTION_ID),
+    steviepAuction.isSettled(AUCTION_ID),
     provider.provider.getBlockNumber(),
     formatAddr(signerAddr, provider),
     bidRequest,
@@ -118,6 +141,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     provider.getNetwork(),
     getEthUsd(uniswapV2)
   ])
+
 
   const hasBid = !!bnToN(highestBid.timestamp)
   const blockTimestamp = (await provider.provider.getBlock(blockNumber)).timestamp
@@ -169,7 +193,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     if (timeLeft < 120000) $timeDiff.innerHTML = `*Your web browser is <br>~${Math.abs(timeDiff/1000)} seconds ${timeDiff < 0 ? 'behind' : 'ahead of'} <br>the blockchain`
 
 
-  } else if (!isActive && !auction.isSettled) {
+  } else if (!isActive && !isSettled) {
     hide($makeBidSection)
     hide($timeLeftSection)
     unhide($highestBidSection)
@@ -183,8 +207,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     $highestBidder.innerHTML = `<a href="https://etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
 
 
-
-  } else if (!isActive && auction.isSettled) {
+  } else if (!isActive && isSettled) {
     hide($makeBidSection)
     hide($timeLeftSection)
     hide($settlementSection)
@@ -242,6 +265,35 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
       <li>All bids must be made in ETH.</li>
     </ul>
   `
+
+  if (auction.allowListContract !== ZERO_ADDR) {
+    const allowList = await provider.contract(auction.allowListContract, allowListContractABI)
+
+    if (bnToN(await allowList.balanceOf(signerAddr)) === 0) {
+      $bidderSecondaryInfo.innerHTML = 'You must own at least 1 Free token to bid'
+      $submitBid.disabled = true
+    } else {
+      $submitBid.disabled = false
+      if (auction.rewardContract !== ZERO_ADDR) {
+        const $wantsReward = $.id('wantsReward')
+        const checked = !$wantsReward || $wantsReward.checked
+
+        $bidderSecondaryInfo.innerHTML = `
+          <label>
+            Recieve 1 FastCash per bid: <input id="wantsReward" type="checkbox" ${checked ? 'checked' : ''}>
+          </label>
+        `
+      } else {
+        $bidderSecondaryInfo.innerHTML = ''
+      }
+
+    }
+  } else {
+    $bidderSecondaryInfo.innerHTML = ''
+    $submitBid.disabled = false
+  }
+
+
 }
 
 provider.onConnect(async () => {
@@ -272,7 +324,9 @@ provider.onConnect(async () => {
       if ($newBidAmount.value < minBid) {
         throw new Error(`Bid must be at least ${minBid} ETH`)
       }
-      const tx = await rawSteviepAuction.connect(provider.signer).bid(AUCTION_ID, ethValue($newBidAmount.value))
+
+      const wantsReward = $.id('wantsReward').checked
+      const tx = await rawSteviepAuction.connect(provider.signer).bid(AUCTION_ID, wantsReward, ethValue($newBidAmount.value))
 
       $bidSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
 
@@ -280,6 +334,10 @@ provider.onConnect(async () => {
 
       setMinBid = false
       updateBidInfo(provider.signer, steviepAuction, uniswapV2)
+
+      const auctionsBidOn = ls.get('__AUCTIONS_BID_ON__') || {}
+      auctionsBidOn[AUCTION_ID] = true
+      ls.set('__AUCTIONS_BID_ON__', JSON.stringify(auctionsBidOn))
 
       unhide($bidSectionContent)
       unhide($biddingHelp)
