@@ -139,6 +139,10 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
       font-weight: bold;
     }
 
+    #connectedAs {
+      text-transform: none;
+    }
+
 
     @media (max-width: 370px) {
       .address {
@@ -214,7 +218,7 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
     }
 
     .auctionPanel:hover {
-      opacity: 0.9;
+      filter: sepia(0.3);
     }
 
     .auctionPanel:hover .infoCard {
@@ -291,13 +295,14 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
   <main>
     <div class="aboveFold">
       <h1>COLD HARD CASH</h1>
-      <p>Each Cold Hard Cash (CASH) token represents an option on the mailing of the physical currency represented in each token thumbnail. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. In addition, the Artist shall make a good faith effort to store all physical currency, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
+      <p>Each Cold Hard Cash (CASH) token represents an option on the mailing of the physical currency pictured in each token thumbnail. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
       <p>The reserve price of each auction is based on the following calculation:</p>
-      <code>ETHUSD * ($U + ($L + $G)/16)</code>
+      <code>ETHUSD * ($U + ($L + $G*USDETH)/16)</code>
       <p>Where</p>
       <code>ETHUSD = The ETH/USD exchange rate as of x/x/xx</code>
+      <code>USDETH = The USD/ETH exchange rate as of x/x/xx</code>
       <code>$U = The nominal value of each piece of physical currency</code>
-      <code>$L = X hours of labor * NYS minimum wage</code>
+      <code>$L = X hours of labor * $15.00 (NYC minimum wage)</code>
       <code>$G = the gas costs of uploading the contract + setting up the auctions</code>
       <div style="display: flex; justify-content: center;">
         <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow">Etherscan</a></h3>
@@ -342,20 +347,20 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
   const auctions = [
     { title: '$0.00', auctionId: 0, url: './auctions/0', img: './assets/0.jpg' },
     { title: '$0.01', auctionId: 1, url: './auctions/1', img: './assets/1.jpg' },
-    { title: '$0.05', auctionId: 2, url: './auctions/2', img: './assets/5.jpg' },
-    { title: '$0.10', auctionId: 3, url: './auctions/3', img: './assets/10.jpg' },
-    { title: '$0.25', auctionId: 4, url: './auctions/4', img: './assets/25.jpg' },
-    { title: '$0.50', auctionId: 5, url: './auctions/5', img: './assets/50.jpg' },
-    { title: '$1.00', auctionId: 6, url: './auctions/6', img: './assets/100.jpg' },
-    { title: '$2.00', auctionId: 7, url: './auctions/7', img: './assets/200.jpg' },
-    { title: '$5.00', auctionId: 8, url: './auctions/8', img: './assets/500.jpg' },
-    { title: '$6.79', auctionId: 9, url: './auctions/9', img: './assets/679.jpg' },
-    { title: '$10.00', auctionId: 10, url: './auctions/10', img: './assets/1000.jpg' },
-    { title: '$20.00', auctionId: 11, url: './auctions/11', img: './assets/2000.jpg' },
-    { title: '$50.00', auctionId: 12, url: './auctions/12', img: './assets/5000.jpg' },
-    { title: '$50.32', auctionId: 13, url: './auctions/13', img: './assets/5032.jpg' },
-    { title: '$100.00', auctionId: 14, url: './auctions/14', img: './assets/10000.jpg' },
-    { title: '$???.??', auctionId: 15, url: './auctions/15', img: './assets/mystery.jpg' },
+    { title: '$0.05', auctionId: 2, url: './auctions/2', img: './assets/2.jpg' },
+    { title: '$0.10', auctionId: 3, url: './auctions/3', img: './assets/3.jpg' },
+    { title: '$0.25', auctionId: 4, url: './auctions/4', img: './assets/4.jpg' },
+    { title: '$0.50', auctionId: 5, url: './auctions/5', img: './assets/5.jpg' },
+    { title: '$1.00', auctionId: 6, url: './auctions/6', img: './assets/6.jpg' },
+    { title: '$2.00', auctionId: 7, url: './auctions/7', img: './assets/7.jpg' },
+    { title: '$5.00', auctionId: 8, url: './auctions/8', img: './assets/8.jpg' },
+    { title: '$6.71', auctionId: 9, url: './auctions/9', img: './assets/9.jpg' },
+    { title: '$10.00', auctionId: 10, url: './auctions/10', img: './assets/10.jpg' },
+    { title: '$20.00', auctionId: 11, url: './auctions/11', img: './assets/11.jpg' },
+    { title: '$50.00', auctionId: 12, url: './auctions/12', img: './assets/12.jpg' },
+    { title: '$50.32', auctionId: 13, url: './auctions/13', img: './assets/13.jpg' },
+    { title: '$100.00', auctionId: 14, url: './auctions/14', img: './assets/14.jpg' },
+    { title: '$???.??', auctionId: 15, url: './auctions/15', img: './assets/15.jpg' },
   ]
 
 
@@ -541,9 +546,9 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
         if (a.isActive && !b.isActive) return -1
         if (b.isActive && !a.isActive) return 1
         if (!a.isActive && !b.isActive) return 0
-        if (!a.isActive || auctionsBidOn[b.auctionId]) return 1
-        if (!b.isActive || auctionsBidOn[a.auctionId]) return -1
-        return b - a
+        if (!a.isActive && auctionsBidOn[b.auctionId]) return 1
+        if (!b.isActive && auctionsBidOn[a.auctionId]) return -1
+        return b.timeLeft - a.timeLeft
       })
       .forEach((auction, i) => {
         const panel = $.id(`auctionPanel-${auction.auctionId}`)

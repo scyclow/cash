@@ -30,7 +30,7 @@
  \______/ |__/  |__/ \______/ |__/  |__/
 
 
-  contract by steviep.eth
+  by steviep.eth
 
 */
 
@@ -113,9 +113,9 @@ contract TokenURI {
   using Strings for uint256;
 
   ColdHardCash public baseContract;
-  string public baseURI = '/';
+  string public baseURI = 'ipfs://bafybeiahxq26mj3r3w2j54hqsqg6vroksdyjtsnktrtocctz5irmiybpre/';
   string public externalUrl = 'https://steviep.xyz/cash';
-  string public description = 'Each Cold Hard Cash (CASH) token represents an option on the mailing of the physical currency represented in each token thumbnail. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. In addition, the Artist shall make a good faith effort to store all physical currency, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.';
+  string public description = 'Each Cold Hard Cash (CASH) token represents an option on the mailing of the physical currency pictured in each token thumbnail. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.';
 
 
   mapping(uint256 => string) public tokenIdToName;
@@ -146,7 +146,7 @@ contract TokenURI {
       'data:application/json;utf8,',
       '{"name": "', tokenIdToName[tokenId],'",',
       '"description": "', description, '",',
-      '"image": "', baseURI, tokenId.toString(), '",',
+      '"image": "', baseURI, tokenId.toString(), '.jpg",',
       '"attributes": [{"trait_type": "Physical has been redeemed", "value": "', baseContract.isRedeemed(tokenId) ? 'True' : 'False', '"}],',
       '"external_url": "', externalUrl, '"',
       '}'

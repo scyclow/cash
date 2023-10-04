@@ -1,15 +1,68 @@
+const ONE_DAY = 60 * 60 * 24
+const TEN_MINUTES = 60 * 10
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+
 async function main() {
-  const [artist, collector1, collector2, collector3] = await ethers.getSigners()
-  console.log('Deploying base contract for artist addr:', artist.address)
+  const signers = await ethers.getSigners()
 
-  TerminallyOnlineFactory = await ethers.getContractFactory('TerminallyOnline', artist)
-  TerminallyOnline = await TerminallyOnlineFactory.deploy()
-  await TerminallyOnline.deployed()
+  admin = signers[0]
+  bidder1 = signers[1]
+  bidder2 = signers[2]
+
+  const SteviepAuctionFactory = await ethers.getContractFactory('SteviepAuctionV1', admin)
+  const ColdHardCashFactory = await ethers.getContractFactory('ColdHardCash', admin)
+  const RewardMinterMockFactory = await ethers.getContractFactory('RewardMinterMock', admin)
+  const AllowListMockFactory = await ethers.getContractFactory('AllowListMock', admin)
+  const UniswapV2MockFactory = await ethers.getContractFactory('UniswapV2Mock', admin)
+
+  const [
+    SteviepAuction,
+    ColdHardCash,
+    RewardMinterMock,
+    AllowListMock,
+    UniswapV2Mock,
+  ] = await Promise.all([
+    SteviepAuctionFactory.deploy(),
+    ColdHardCashFactory.deploy(),
+    RewardMinterMockFactory.deploy(),
+    AllowListMockFactory.deploy(),
+    UniswapV2MockFactory.deploy(),
+  ])
+
+  await Promise.all([
+    SteviepAuction.deployed(),
+    ColdHardCash.deployed(),
+    RewardMinterMock.deployed(),
+    AllowListMock.deployed(),
+    UniswapV2Mock.deployed(),
+  ])
+
+  await ColdHardCash.connect(admin).setMinter(SteviepAuction.address)
 
 
-  console.log(`TerminallyOnline:`, TerminallyOnline.address)
-  console.log(`Multisig:`, await TerminallyOnline.connect(artist).multisig())
-  console.log(`TokenURI:`, await TerminallyOnline.connect(artist).tokenURIContract())
+  for (let i = 0; i < 16; i++) {
+    await SteviepAuction.connect(admin).create(
+      false,
+      300,
+      1000,
+      300,
+      '100000000000000000',
+      1,
+      admin.address,
+      false,
+      ColdHardCash.address,
+      RewardMinterMock.address,
+      AllowListMock.address,
+    )
+  }
+  await AllowListMock.connect(admin).setBalance(admin.address, 1)
+
+
+  console.log(`SteviepAuction:`, SteviepAuction.address)
+  console.log(`ColdHardCash:`, ColdHardCash.address)
+  console.log(`UniswapV2Mock:`, UniswapV2Mock.address)
+  console.log(`AllowListMock:`, AllowListMock.address)
+  console.log('admin:', admin.address)
 }
 
 

@@ -13,9 +13,9 @@ async function main() {
   SteviepAuction = await SteviepAuctionFactory.deploy()
   await SteviepAuction.deployed()
 
-  const MinterMockFactory = await ethers.getContractFactory('MinterMock', admin)
-  MinterMock = await MinterMockFactory.deploy()
-  await MinterMock.deployed()
+  const ColdHardCashFactory = await ethers.getContractFactory('ColdHardCash', admin)
+  ColdHardCash = await ColdHardCashFactory.deploy()
+  await ColdHardCash.deployed()
 
   const RewardMinterMockFactory = await ethers.getContractFactory('RewardMinterMock', admin)
   RewardMinterMock = await RewardMinterMockFactory.deploy()
@@ -30,6 +30,9 @@ async function main() {
   UniswapV2Mock = await UniswapV2MockFactory.deploy()
   await UniswapV2Mock.deployed()
 
+  await ColdHardCash.connect(admin).setMinter(SteviepAuction.address)
+
+
 
   for (let i = 0; i < 16; i++) {
     await SteviepAuction.connect(admin).create(
@@ -41,7 +44,7 @@ async function main() {
       1,
       admin.address,
       false,
-      MinterMock.address,
+      ColdHardCash.address,
       RewardMinterMock.address,
       AllowListMock.address,
     )
@@ -50,7 +53,7 @@ async function main() {
 
 
   console.log(`SteviepAuction:`, SteviepAuction.address)
-  console.log(`MinterMock:`, MinterMock.address)
+  console.log(`ColdHardCash:`, ColdHardCash.address)
   console.log(`UniswapV2Mock:`, UniswapV2Mock.address)
   console.log(`AllowListMock:`, AllowListMock.address)
   console.log('admin:', admin.address)

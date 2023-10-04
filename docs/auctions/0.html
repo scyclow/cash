@@ -44,9 +44,7 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
 <body>
   <header><h2><a href="../">Cold Hard Cash</a></h2></header>
   <main>
-    <div class="imgContainer">
-      <img src="../assets/0.jpg">
-    </div>
+    <div class="imgContainer"></div>
 
     <h1>$0.00</h1>
 
@@ -127,13 +125,14 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
       </section>
     </connect-wallet>
 
-      <p>Each Cold Hard Cash (CASH) token represents an option on the mailing of the physical currency represented in each token thumbnail. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. In addition, the Artist shall make a good faith effort to store all physical currency, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
+      <p>Each Cold Hard Cash (CASH) token represents an option on the mailing of the physical currency pictured in each token thumbnail. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
       <p>The reserve price of each auction is based on the following calculation:</p>
-      <code>ETHUSD * ($U + ($L + $G)/16)</code>
+      <code>ETHUSD * ($U + ($L + $G*USDETH)/16)</code>
       <p>Where</p>
       <code>ETHUSD = The ETH/USD exchange rate as of x/x/xx</code>
+      <code>USDETH = The USD/ETH exchange rate as of x/x/xx</code>
       <code>$U = The nominal value of each piece of physical currency</code>
-      <code>$L = X hours of labor * NYS minimum wage</code>
+      <code>$L = X hours of labor * $15.00 (NYC minimum wage)</code>
       <code>$G = the gas costs of uploading the contract + setting up the auctions</code>
 
     <connect-wallet id="wallet-connect">

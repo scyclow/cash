@@ -98,6 +98,13 @@ const $answerContent = $.id('answerContent')
 
 const $biddingHelp = $.id('biddingHelp')
 
+$.cls('imgContainer')[0].innerHTML = `
+  <a href="../assets/${AUCTION_ID}.jpg">
+    <img src="../assets/${AUCTION_ID}.jpg">
+  </a>
+`
+
+
 let stopActiveCountdownInterval = () => {}
 let setMinBid = false
 async function updateBidInfo(signer, steviepAuction, uniswapV2) {
@@ -476,6 +483,9 @@ function triggerTimer(timeLeft, $elem) {
     const minutes = 60 * (hours%1)
     const seconds = Math.floor(60 * (minutes%1))
     const ms = Math.floor(timeLeftCounter % 1000 / 100) % 10
+
+    if (timeLeft < 300000) $elem.innerHTML = `*Your web browser is <br>~${Math.abs(timeDiff/1000)} seconds ${timeDiff < 0 ? 'behind' : 'ahead of'} <br>the blockchain`
+
 
     $elem.innerHTML = `${Math.floor(days)}:${with0(hours)}:${with0(minutes)}:${with0(seconds)}`
   }, 1000)
