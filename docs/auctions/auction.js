@@ -419,8 +419,8 @@ async function formatAddr(addr, provider, truncate=true) {
   try {
     const ens = await provider.getENS(addr)
     if (ens.slice(-4) === '.eth') {
-      return ens.length > 10
-        ? ens.slice(0, 10) + '...'
+      return ens.length > 19
+        ? ens.slice(0, 16) + '...'
         : ens
     } else {
       return truncate ? truncateAddr(addr) : addr
