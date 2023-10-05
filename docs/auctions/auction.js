@@ -241,7 +241,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
       notificationPermission.then(p => {
         new Notification(`New bid: ${auctionData[AUCTION_ID].title} - ${bidAmount} ETH`)
       })
-    } else if (bidAmount !== recentBidMap[a.auctionId]) {
+    } else if (bidAmount !== lastBid) {
       lastBid = bidAmount
     }
 
