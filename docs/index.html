@@ -498,7 +498,7 @@
   const activeCountdownIntervals = {}
   const recentBidMap = {}
 
-  async function updateBidInfo(signer, steviepAuction) {
+  async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     const signerAddr = await signer.getAddress()
 
     const [
@@ -524,11 +524,13 @@
         auction,
         auctionEndTime,
         isActive,
+        ethUsd
       ] = await Promise.all([
         steviepAuction.auctionIdToHighestBid(a.auctionId),
         steviepAuction.auctionIdToAuction(a.auctionId),
         steviepAuction.auctionEndTime(a.auctionId),
         steviepAuction.isActive(a.auctionId),
+        getEthUsd(uniswapV2)
       ])
 
       const reservePrice = ethVal(auction.minBid)
@@ -545,9 +547,9 @@
       const $timeLeft = $.id(`timeLeft-${a.auctionId}`)
 
       if (!bidAmount) {
-        $highestBid.innerHTML = `Reserve: ${reservePrice} ETH`
+        $highestBid.innerHTML = `Reserve: ${reservePrice} ETH (~$${(reservePrice * ethUsd).toFixed(2)})`
       } else if (isActive) {
-        $highestBid.innerHTML = `Highest Bid: ${bidAmount} ETH` + (endingSoon ? ' [ENDING SOON]' : '')
+        $highestBid.innerHTML = `Highest Bid: ${bidAmount} ETH (~$${(bidAmount * ethUsd).toFixed(2)})` + (endingSoon ? ' [ENDING SOON]' : '')
         if (activeCountdownIntervals[a.auctionId]) activeCountdownIntervals[a.auctionId]()
 
         activeCountdownIntervals[a.auctionId] = triggerTimer(timeLeft, $timeLeft)
@@ -565,7 +567,7 @@
         }
 
       } else {
-        $highestBid.innerHTML = `Sold for: ${bidAmount} ETH`
+        $highestBid.innerHTML = `Sold for: ${bidAmount} ETH (~$${(bidAmount * ethUsd).toFixed(2)})`
       }
     }
 
