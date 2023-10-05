@@ -1,3 +1,21 @@
+const auctionData = [
+  { title: '$0.00', auctionId: 0, url: './auctions/0', img: './assets/0.jpg' },
+  { title: '$0.01', auctionId: 1, url: './auctions/1', img: './assets/1.jpg' },
+  { title: '$0.05', auctionId: 2, url: './auctions/2', img: './assets/2.jpg' },
+  { title: '$0.10', auctionId: 3, url: './auctions/3', img: './assets/3.jpg' },
+  { title: '$0.25', auctionId: 4, url: './auctions/4', img: './assets/4.jpg' },
+  { title: '$0.50', auctionId: 5, url: './auctions/5', img: './assets/5.jpg' },
+  { title: '$1.00', auctionId: 6, url: './auctions/6', img: './assets/6.jpg' },
+  { title: '$2.00', auctionId: 7, url: './auctions/7', img: './assets/7.jpg' },
+  { title: '$5.00', auctionId: 8, url: './auctions/8', img: './assets/8.jpg' },
+  { title: '$6.71', auctionId: 9, url: './auctions/9', img: './assets/9.jpg' },
+  { title: '$10.00', auctionId: 10, url: './auctions/10', img: './assets/10.jpg' },
+  { title: '$20.00', auctionId: 11, url: './auctions/11', img: './assets/11.jpg' },
+  { title: '$50.00', auctionId: 12, url: './auctions/12', img: './assets/12.jpg' },
+  { title: '$50.32', auctionId: 13, url: './auctions/13', img: './assets/13.jpg' },
+  { title: '$100.00', auctionId: 14, url: './auctions/14', img: './assets/14.jpg' },
+  { title: '$???.??', auctionId: 15, url: './auctions/15', img: './assets/15.jpg' },
+]
 
 const provider = new Web3Provider()
 mountComponents(
@@ -101,6 +119,8 @@ const $answerX = $.id('answerX')
 const $answerContent = $.id('answerContent')
 
 const $biddingHelp = $.id('biddingHelp')
+const $wantsNotifications = $.id('wantsNotifications')
+
 
 $.cls('imgContainer')[0].innerHTML = `
   <a href="../assets/${AUCTION_ID}.jpg">
@@ -108,6 +128,16 @@ $.cls('imgContainer')[0].innerHTML = `
   </a>
 `
 
+
+let notificationPermission, lastBid
+
+if ($wantsNotifications) $wantsNotifications.onclick = () => {
+  if ($wantsNotifications.checked) {
+    notificationPermission = Notification.requestPermission()
+  } else {
+    notificationPermission = false
+  }
+}
 
 let stopActiveCountdownInterval = () => {}
 let setMinBid = false
@@ -203,6 +233,17 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     stopActiveCountdownInterval = triggerTimer(timeLeft, $timeLeft)
     if (timeLeft < 120000) $timeDiff.innerHTML = `*Your web browser is <br>~${Math.abs(timeDiff/1000)} seconds ${timeDiff < 0 ? 'behind' : 'ahead of'} <br>the blockchain`
 
+    if (!lastBid) {
+      lastBid = bidAmount
+    } else if (notificationPermission && (bidAmount !== lastBid)) {
+      lastBid = bidAmount
+
+      notificationPermission.then(p => {
+        new Notification(`New bid: ${auctionData[AUCTION_ID].title} - ${bidAmount} ETH`)
+      })
+    } else if (bidAmount !== recentBidMap[a.auctionId]) {
+      lastBid = bidAmount
+    }
 
   } else if (!isActive && !isSettled) {
     hide($makeBidSection)

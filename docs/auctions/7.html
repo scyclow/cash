@@ -80,6 +80,12 @@
         </section>
 
         <section id="makeBidSection" class="bidSection" style="display: none;">
+          <div class="center" style="margin-bottom:1.5em;">
+            <label style="cursor: pointer;">
+              <input type="checkbox" id="wantsNotifications" style="cursor: pointer;">
+              receive notifications on bids for this auction
+            </label>
+          </div>
           <div id="bidSectionContent">
             <input id="newBidAmount" placeholder="ETH" type="number" step="0.1">
             <button id="submitBid">Bid</button>
@@ -92,10 +98,8 @@
                 <div style="display: flex; justify-content: end;">
                   <div id="answerX" style="padding: 0.25em">X</div>
                 </div>
-                <div id="answerContent">
-
-                </div>
-              </div>
+                <div id="answerContent"></div>
+               </div>
             </div>
           </div>
           <div id="bidSectionError" class="error"></div>

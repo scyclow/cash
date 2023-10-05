@@ -296,6 +296,18 @@
     </div>
 
 
+    <connect-wallet id="wallet-connect">
+      <section slot="connected">
+        <div class="center" style="margin:1.5em 0;">
+          <label style="cursor: pointer;">
+            <input type="checkbox" id="wantsNotifications" style="cursor: pointer;">
+            receive notifications on all new bids
+          </label>
+        </div>
+      </section>
+    </connect-wallet>
+
+
 
     <section id="grid" class="grid">
 
@@ -446,6 +458,7 @@
   const $connectedBalance = $.id('connectedBalance')
   const $connectedNetwork = $.id('connectedNetwork')
   const $etherscanLink = $.id('etherscanLink')
+  const $wantsNotifications = $.id('wantsNotifications')
 
 
   $etherscanLink.href = `https://${etherscanPrefix}etherscan.io/address/${COLD_HARD_CASH}`
@@ -470,13 +483,22 @@
   `).join('')
 
 
+  let notificationPermission
+
+  if ($wantsNotifications) $wantsNotifications.onclick = () => {
+    if ($wantsNotifications.checked) {
+      notificationPermission = Notification.requestPermission()
+    } else {
+      notificationPermission = false
+    }
+  }
 
 
 
   const activeCountdownIntervals = {}
+  const recentBidMap = {}
 
   async function updateBidInfo(signer, steviepAuction) {
-
     const signerAddr = await signer.getAddress()
 
     const [
@@ -529,6 +551,18 @@
         if (activeCountdownIntervals[a.auctionId]) activeCountdownIntervals[a.auctionId]()
 
         activeCountdownIntervals[a.auctionId] = triggerTimer(timeLeft, $timeLeft)
+
+        if (!recentBidMap[a.auctionId]) {
+          recentBidMap[a.auctionId] = bidAmount
+        } else if (notificationPermission && (bidAmount !== recentBidMap[a.auctionId])) {
+          recentBidMap[a.auctionId] = bidAmount
+
+          notificationPermission.then(p => {
+            new Notification(`New bid: ${a.title} - ${bidAmount} ETH`)
+          })
+        } else if (bidAmount !== recentBidMap[a.auctionId]) {
+          recentBidMap[a.auctionId] = bidAmount
+        }
 
       } else {
         $highestBid.innerHTML = `Sold for: ${bidAmount} ETH`
