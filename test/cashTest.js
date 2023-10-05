@@ -106,7 +106,7 @@ describe('SteviepAuction', () => {
       expect(await ColdHardCash.connect(admin).totalSupply()).to.equal(0)
       expect(await ColdHardCash.connect(admin).exists(3)).to.equal(false)
 
-      await SteviepAuction.connect(bidder1)[bidWithReward](3, true, bidAmount(0.1))
+      await SteviepAuction.connect(bidder1)[bidWithReward](3, true, bidAmount(0.12345))
 
       await expectRevert(
         SteviepAuction.connect(bidder2)[bidWithReward](3, true, bidAmount(0.2)),
@@ -165,9 +165,19 @@ describe('SteviepAuction', () => {
       const uri0 = getJsonURI(await ColdHardCash.connect(admin).tokenURI(0))
       const uri3 = getJsonURI(await ColdHardCash.connect(admin).tokenURI(3))
 
-      expect(uri0.attributes.length).to.equal(1)
+      console.log(uri0.attributes)
+
+      expect(uri0.attributes.length).to.equal(2)
+      expect(uri3.attributes.length).to.equal(2)
+
+      expect(uri0.attributes[0].trait_type).to.equal('Physical Redeemed')
+      expect(uri0.attributes[1].trait_type).to.equal('Original Sale Price')
+
       expect(uri0.attributes[0].value).to.equal('True')
       expect(uri3.attributes[0].value).to.equal('False')
+
+      expect(uri0.attributes[1].value).to.equal('100000000000000000 wei')
+      expect(uri3.attributes[1].value).to.equal('123450000000000000 wei')
       expect(ethVal(await FastCashMoneyPlus.connect(admin).balanceOf(bidder1.address))).to.equal(2)
     })
   })

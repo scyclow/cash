@@ -108,6 +108,10 @@ contract ColdHardCash is ERC721, Ownable {
 }
 
 
+interface ICashMinter {
+  function auctionIdToHighestBid(uint256) external view returns (uint128 amount, uint128 timestamp, address bidder);
+}
+
 
 contract TokenURI {
   using Strings for uint256;
@@ -142,12 +146,21 @@ contract TokenURI {
   }
 
   function tokenURI(uint256 tokenId) public view  returns (string memory) {
+    (uint128 originalSaleAmount, ,) = ICashMinter(baseContract.minter()).auctionIdToHighestBid(tokenId);
+
+    string memory originalSalePrice = string.concat(
+      '{"trait_type": "Original Sale Price", "value": "',
+      (uint256(originalSaleAmount)).toString(),
+      ' wei',
+      '"}'
+    );
+
     bytes memory json = abi.encodePacked(
       'data:application/json;utf8,',
       '{"name": "', tokenIdToName[tokenId],'",',
       '"description": "', description, '",',
       '"image": "', baseURI, tokenId.toString(), '.jpg",',
-      '"attributes": [{"trait_type": "Physical has been redeemed", "value": "', baseContract.isRedeemed(tokenId) ? 'True' : 'False', '"}],',
+      '"attributes": [{"trait_type": "Physical Redeemed", "value": "', baseContract.isRedeemed(tokenId) ? 'True' : 'False', '"},', originalSalePrice,'],',
       '"external_url": "', externalUrl, '"',
       '}'
     );

@@ -5,16 +5,18 @@ mountComponents(
   ConnectButton(provider),
 )
 
-const network = 'local'
+const network = 'goerli'
 
   const STEVIEP_AUCTION = {
     // local: '0x46d4674578a2daBbD0CEAB0500c6c7867999db34'
-    local: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+    local: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+    goerli: '0x39665bCA42F60413b2E162a24a2FE1B290F5a2f9',
   }[network]
 
   const UNISWAP_V2 = {
     // local: '0xC220Ed128102d888af857d137a54b9B7573A41b2',
     local: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
+    goerli: '0xB3ca1a2F6dAD720B5D89cc2cf2B0160aB357f13E',
     mainnet: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
   }[network]
 
@@ -332,7 +334,8 @@ provider.onConnect(async () => {
         throw new Error(`Bid must be at least ${minBid} ETH`)
       }
 
-      const wantsReward = $.id('wantsReward').checked
+      const $wantsReward = $.id('wantsReward')
+      const wantsReward = $wantsReward && $wantsReward.checked
       const tx = await rawSteviepAuction.connect(provider.signer).bid(AUCTION_ID, wantsReward, ethValue($newBidAmount.value))
 
       $bidSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`

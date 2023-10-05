@@ -41,7 +41,7 @@ async function main() {
       1000,
       300,
       '100000000000000000',
-      1,
+      i,
       admin.address,
       false,
       ColdHardCash.address,
