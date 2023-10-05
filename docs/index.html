@@ -575,16 +575,16 @@
       .sort((a, b) => {
         if (b.endingSoon && !a.endingSoon) return 1
         if (a.endingSoon && !b.endingSoon) return -1
-        if (a.isActive && !b.isActive) return -1
-        if (b.isActive && !a.isActive) return 1
-        if (!a.isActive && !b.isActive) return 0
-        if (!a.isActive && auctionsBidOn[b.auctionId]) return 1
-        if (!b.isActive && auctionsBidOn[a.auctionId]) return -1
-        if (a.timeLeft && !b.timeLeft) return -1
-        if (!a.timeLeft && b.timeLeft) return 1
-        if (a.timeLeft && b.timeLeft) {
-          return a.timeLeft - b.timeLeft
-        }
+        // if (a.isActive && !b.isActive) return -1
+        // if (b.isActive && !a.isActive) return 1
+        // if (!a.isActive && !b.isActive) return 0
+        // if (!a.isActive && auctionsBidOn[b.auctionId]) return 1
+        // if (!b.isActive && auctionsBidOn[a.auctionId]) return -1
+        // if (a.timeLeft && !b.timeLeft) return -1
+        // if (!a.timeLeft && b.timeLeft) return 1
+        // if (a.timeLeft && b.timeLeft) {
+        //   return a.timeLeft - b.timeLeft
+        // }
         return 0
       })
       .forEach((auction, i) => {
