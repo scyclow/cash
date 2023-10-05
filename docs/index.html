@@ -174,25 +174,23 @@
       width: 100%;
     }
 
-    .grid > *:last-child {
-      grid-column-start: 2;
-    }
-
     @media (max-width: 1100px) {
       .grid {
         grid-template-columns: 1fr 1fr;
         max-width: 1000px;
       }
-
+      .grid > * {
+        grid-column-start: initial !important;
+      }
     }
 
 
     @media (max-width: 500px) {
-    .grid > *:last-child {
-      grid-column-start: 1;
-    }
       .grid {
         grid-template-columns: 1fr;
+      }
+      .grid > *:last-child {
+        grid-column-start: initial !important;
       }
     }
 
@@ -530,7 +528,7 @@
       const hasBid = !!bnToN(highestBid.timestamp)
 
       const bidAmount = ethVal(highestBid.amount)
-      const timeLeft = bnToN(auctionEndTime)*1000 - Date.now()
+      const timeLeft = Math.max(bnToN(auctionEndTime)*1000 - Date.now(), 0)
 
       const endingSoon = timeLeft < auction.bidTimeExtension*1000 && timeLeft > 0 && isActive
 
@@ -563,11 +561,19 @@
         if (!a.isActive && !b.isActive) return 0
         if (!a.isActive && auctionsBidOn[b.auctionId]) return 1
         if (!b.isActive && auctionsBidOn[a.auctionId]) return -1
-        return b.timeLeft - a.timeLeft
+        if (a.timeLeft && !b.timeLeft) return -1
+        if (!a.timeLeft && b.timeLeft) return 1
+        if (a.timeLeft && b.timeLeft) {
+          return a.timeLeft - b.timeLeft
+        }
+        return 0
       })
       .forEach((auction, i) => {
         const panel = $.id(`auctionPanel-${auction.auctionId}`)
         $(panel, 'order', i)
+        if (i === timeLeftList.length-1) {
+          $(panel, 'grid-column-start', '2')
+        }
 
         if (auction.endingSoon) panel.classList.add('endingSoon')
       })
