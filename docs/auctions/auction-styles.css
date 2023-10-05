@@ -31,6 +31,7 @@ label, label input {
 
 .address {
   font-family: monospace;
+  font-weight: bold;
 }
 
 #connectWalletSection {
@@ -263,18 +264,6 @@ ul#previousBidList {
   cursor: pointer;
 }
 
-.nightmode * {
-  color: #fff;
-}
-body.nightmode {
-  background: #000;
-}
-.nightmode input {
-  color: #000;
-}
-.nightmode a, .nightmode #question {
-  color: #00a7ff;
-}
 
 header h2 {
   margin-bottom: 0;
@@ -285,9 +274,6 @@ header a {
   padding: 1em;
 }
 
-.nightmode header a {
-  color: #fff;
-}
 
 p {
   margin-bottom: 0.5em;

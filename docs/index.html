@@ -145,21 +145,6 @@
     }
 
 
-
-    .nightmode * {
-      color: #fff;
-    }
-    body.nightmode {
-      background: #000;
-    }
-    .nightmode input {
-      color: #000;
-    }
-    .nightmode a, .nightmode #question {
-      color: #00a7ff;
-    }
-
-
     .grid {
       margin: auto;
       padding: 1em;
@@ -579,7 +564,7 @@
       })
 
 
-    $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(block.timestamp*1000)}<br>[Block: ${blockNumber}]<br><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a>`
+    $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(block.timestamp*1000)}<br>[Block: ${blockNumber}]<br><strong><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a></strong>`
 
     $connectedAs.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${signerAddr}" target="_blank" class="address">${
       isENS(formattedAddr) ? formattedAddr : await formatAddr(signerAddr, provider)
@@ -699,6 +684,7 @@
 
 <script type="text/javascript">
   var hours = new Date().getHours();
-  if (hours <= 5 || hours >= 22) document.body.className = 'nightmode';
+  if (hours <= 5 || hours >= 22)
+    document.body.className = 'nightmode';
 </script>
 </html>

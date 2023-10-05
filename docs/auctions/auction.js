@@ -158,7 +158,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
   const blockTimestamp = (await provider.provider.getBlock(blockNumber)).timestamp
   const timeDiff = Date.now() - blockTimestamp*1000
 
-  $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]<br><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a>`
+  $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]<br><strong><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a></strong>`
   if (isENS(formattedAddr)) {
     $connectedAs1.innerHTML = formattedAddr
   }

@@ -3,6 +3,11 @@
   margin: 0;
 }
 
+body {
+  background: #fcfbf5;
+  color: #20251f;
+}
+
 .center {
   margin: auto;
   display: flex;
@@ -20,4 +25,25 @@
 a {
   /*color: #007647;*/
   color: #0063ff;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.nightmode * {
+  color: #f6fcf5;
+}
+body.nightmode {
+  background: #20251f;
+}
+.nightmode input {
+  color: #20251f;
+}
+.nightmode a, .nightmode #question {
+  color: #00a7ff;
+}
+
+.nightmode header a {
+  color: #f6fcf5;
 }
