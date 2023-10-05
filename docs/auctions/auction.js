@@ -7,6 +7,8 @@ mountComponents(
 
 const network = 'goerli'
 
+const etherscanPrefix = network === 'goerli' ? 'goerli.' : ''
+
   const STEVIEP_AUCTION = {
     // local: '0x46d4674578a2daBbD0CEAB0500c6c7867999db34'
     local: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
@@ -156,11 +158,11 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
   const blockTimestamp = (await provider.provider.getBlock(blockNumber)).timestamp
   const timeDiff = Date.now() - blockTimestamp*1000
 
-  $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]`
+  $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]<br><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a>`
   if (isENS(formattedAddr)) {
     $connectedAs1.innerHTML = formattedAddr
   }
-  $connectedAs2.innerHTML = `<a href="https://etherscan.io/address/${signerAddr}" target="_blank" class="address">${signerAddr}</a>`
+  $connectedAs2.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${signerAddr}" target="_blank" class="address">${signerAddr}</a>`
   $connectedBalance.innerHTML = `Balance: ${ethVal(connectedBalance)} ETH`
 
   let networkName, networkDescriptor
@@ -193,7 +195,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
 
     const bidAmount = ethVal(highestBid.amount)
     $highestBidAmount.innerHTML = `${bidAmount} ETH <div class="bidUSD">(~$${(bidAmount * ethUsd).toFixed(2)})</div>`
-    $highestBidder.innerHTML = `<a href="https://etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
+    $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
 
 
     stopActiveCountdownInterval()
@@ -213,7 +215,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     $highestBidLabel.innerHTML = 'WINNING BID'
 
     $highestBidAmount.innerHTML = ethVal(highestBid.amount) + ' ETH'
-    $highestBidder.innerHTML = `<a href="https://etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
+    $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
 
 
   } else if (!isActive && isSettled) {
@@ -226,7 +228,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
 
     $highestBidLabel.innerHTML = 'WINNING BID'
     $highestBidAmount.innerHTML = ethVal(highestBid.amount) + ' ETH'
-    $highestBidder.innerHTML = `<a href="https://etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
+    $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
 
   }
   setMinBid = true
@@ -241,7 +243,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
           <div class="bidHistoryRow">
             <div>BID: ${bidAmountPretty} ETH (~$${bidAmountUSD})</div>
             <div>
-              <a href="https://etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
+              <a href="https://${etherscanPrefix}etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
             </div>
           </div>
           <div>${new Date(bid.timestamp * 1000)}</div>
@@ -338,7 +340,7 @@ provider.onConnect(async () => {
       const wantsReward = $wantsReward && $wantsReward.checked
       const tx = await rawSteviepAuction.connect(provider.signer).bid(AUCTION_ID, wantsReward, ethValue($newBidAmount.value))
 
-      $bidSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
+      $bidSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://${etherscanPrefix}etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
 
       const txReciept1 = await tx.wait(1)
 
@@ -374,7 +376,7 @@ provider.onConnect(async () => {
     try {
       const tx = await rawSteviepAuction.connect(provider.signer).settle(AUCTION_ID)
 
-      $settlementSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
+      $settlementSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://${etherscanPrefix}etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
 
       const txReciept1 = await tx.wait(1)
 

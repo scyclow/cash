@@ -62,6 +62,7 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
 
     .lastUpdatedSection {
       margin-top: 2em;
+      margin-bottom: 2em;
     }
 
     footer {
@@ -317,7 +318,7 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
       <code>$L = X hours of labor * $15.00 (NYC minimum wage)</code>
       <code>$G = the gas costs of uploading the contract + setting up the auctions</code>
       <div style="display: flex; justify-content: center;">
-        <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow">Etherscan</a></h3>
+        <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow" id="etherscanLink">Etherscan</a></h3>
         <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow">OpenSea</a></h3>
       </div>
     </div>
@@ -402,6 +403,8 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
   )
 
   const network = 'goerli'
+  const etherscanPrefix = network === 'goerli' ? 'goerli.' : ''
+
 
   const STEVIEP_AUCTION = {
     // local: '0x46d4674578a2daBbD0CEAB0500c6c7867999db34'
@@ -414,6 +417,11 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
     local: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
     goerli: '0xB3ca1a2F6dAD720B5D89cc2cf2B0160aB357f13E',
     mainnet: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+  }[network]
+
+  const COLD_HARD_CASH = {
+    local: '0x4A679253410272dd5232B3Ff7cF5dbB88f295319',
+    goerli: '0x1993C771E5bE2bac9Eea3297EA850c5Da3cf732F',
   }[network]
 
 
@@ -465,6 +473,10 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
   const $connectedAs = $.id('connectedAs')
   const $connectedBalance = $.id('connectedBalance')
   const $connectedNetwork = $.id('connectedNetwork')
+  const $etherscanLink = $.id('etherscanLink')
+
+
+  $etherscanLink.href = `https://${etherscanPrefix}etherscan.io/address/${COLD_HARD_CASH}`
 
 
 
@@ -572,9 +584,9 @@ explain this auction is for x time, bids extend by x, bids must increase by x%
       })
 
 
-    $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(block.timestamp*1000)}<br>[Block: ${blockNumber}]`
+    $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(block.timestamp*1000)}<br>[Block: ${blockNumber}]<br><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a>`
 
-    $connectedAs.innerHTML = `<a href="https://etherscan.io/address/${signerAddr}" target="_blank" class="address">${
+    $connectedAs.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${signerAddr}" target="_blank" class="address">${
       isENS(formattedAddr) ? formattedAddr : await formatAddr(signerAddr, provider)
     }</a>`
     $connectedBalance.innerHTML = `Balance: ${ethVal(connectedBalance)} ETH`
