@@ -239,7 +239,11 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
       lastBid = bidAmount
 
       notificationPermission.then(p => {
-        new Notification(`New bid: ${auctionData[AUCTION_ID].title} - ${bidAmount} ETH`)
+        const notification = new Notification(`💵 New Cold Hard Cash Bid 💵`, {
+          body: `${auctionData[AUCTION_ID].title} → ${bidAmount} ETH`,
+          icon: `../assets/${AUCTION_ID}.jpg`,
+          requireInteraction: true
+        })
       })
     } else if (bidAmount !== lastBid) {
       lastBid = bidAmount

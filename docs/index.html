@@ -561,7 +561,11 @@
           recentBidMap[a.auctionId] = bidAmount
 
           notificationPermission.then(p => {
-            new Notification(`New bid: ${a.title} - ${bidAmount} ETH`)
+            const notification = new Notification(`💵 New Cold Hard Cash Bid 💵`, {
+              body: `${a.title} → ${bidAmount} ETH`,
+              icon: `../assets/${AUCTION_ID}.jpg`,
+              requireInteraction: true
+            })
           })
         } else if (bidAmount !== recentBidMap[a.auctionId]) {
           recentBidMap[a.auctionId] = bidAmount
