@@ -563,7 +563,7 @@
           notificationPermission.then(p => {
             const notification = new Notification(`💵 New Cold Hard Cash Bid 💵`, {
               body: `${a.title} → ${bidAmount} ETH`,
-              icon: `../assets/${AUCTION_ID}.jpg`,
+              icon: `./assets/${a.auctionId}.jpg`,
               requireInteraction: true
             })
           })
