@@ -8,7 +8,7 @@ const auctionData = [
   { title: '$1.00', auctionId: 6, url: './auctions/6', img: './assets/6.jpg' },
   { title: '$2.00', auctionId: 7, url: './auctions/7', img: './assets/7.jpg' },
   { title: '$5.00', auctionId: 8, url: './auctions/8', img: './assets/8.jpg' },
-  { title: '$6.71', auctionId: 9, url: './auctions/9', img: './assets/9.jpg' },
+  { title: '$6.67', auctionId: 9, url: './auctions/9', img: './assets/9.jpg' },
   { title: '$10.00', auctionId: 10, url: './auctions/10', img: './assets/10.jpg' },
   { title: '$20.00', auctionId: 11, url: './auctions/11', img: './assets/11.jpg' },
   { title: '$50.00', auctionId: 12, url: './auctions/12', img: './assets/12.jpg' },

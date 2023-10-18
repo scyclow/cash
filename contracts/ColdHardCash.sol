@@ -119,7 +119,7 @@ contract TokenURI {
   ColdHardCash public baseContract;
   string public baseURI = 'ipfs://bafybeiahxq26mj3r3w2j54hqsqg6vroksdyjtsnktrtocctz5irmiybpre/';
   string public externalUrl = 'https://steviep.xyz/cash';
-  string public description = 'Each Cold Hard Cash (CASH) token depicts the amount of currency that shall be mailed to the corresponding token holder upon request. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.';
+  string public description = "Each Cold Hard Cash (CASH) token holder may request that the currency depicted in their token's thumbnail be mailed to them. All shipment costs above the cost of standard domestic postage shall be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.";
 
 
   mapping(uint256 => string) public tokenIdToName;
@@ -136,7 +136,7 @@ contract TokenURI {
     tokenIdToName[6] = '$1.00';
     tokenIdToName[7] = '$2.00';
     tokenIdToName[8] = '$5.00';
-    tokenIdToName[9] = '$6.79';
+    tokenIdToName[9] = '$6.67';
     tokenIdToName[10] = '$10.00';
     tokenIdToName[11] = '$20.00';
     tokenIdToName[12] = '$50.00';

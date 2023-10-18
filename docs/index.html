@@ -8,7 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💵</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="description" content="Each Cold Hard Cash (CASH) token depicts the amount of currency that shall be mailed to the corresponding token holder upon request. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.">
+  <meta name="description" content="Each Cold Hard Cash (CASH) token holder may request that the currency depicted in their token's thumbnail be mailed to them. All shipment costs above the cost of standard domestic postage shall be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.">
   <meta name="keywords" content="cold hard cash, cold, hard, cash, auction, nft, photography, conceptual photography, conceptual art, art, steviep, steve pikelny, pikelny, crypto, ethereum, bitcoin">
 
   <meta name="twitter:image" content="https://steviep.xyz/cash/assets/11.jpg">
@@ -16,7 +16,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@steviepxyz">
   <meta name="twitter:site" content="@steviepxyz">
-  <meta property="twitter:description" content="Each Cold Hard Cash (CASH) token depicts the amount of currency that shall be mailed to the corresponding token holder upon request. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.">
+  <meta property="twitter:description" content="Each Cold Hard Cash (CASH) token holder may request that the currency depicted in their token's thumbnail be mailed to them. All shipment costs above the cost of standard domestic postage shall be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.">
 
   <meta name="og:image" property="og:image" content="https://steviep.xyz/cash/assets/11.jpg">
   <meta name="og:image:alt" content="Cold Hard Cash">
@@ -24,7 +24,7 @@
   <meta property="og:url" content="https://steviep.xyz/cash">
   <meta property="og:title" content="Cold Hard Cash">
   <meta property="og:site_name" content="Cold Hard Cash">
-  <meta property="og:description" content="Each Cold Hard Cash (CASH) token depicts the amount of currency that shall be mailed to the corresponding token holder upon request. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.">
+  <meta property="og:description" content="Each Cold Hard Cash (CASH) token holder may request that the currency depicted in their token's thumbnail be mailed to them. All shipment costs above the cost of standard domestic postage shall be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.">
 
   <link rel="stylesheet" type="text/css" href="./styles.css">
 
@@ -257,6 +257,24 @@
       margin-bottom: 0.5em;
     }
 
+    aside {
+      font-size: 10px;
+      display: block;
+      margin: 0.8em auto;
+      max-width: 450px;
+    }
+
+    .calculation code {
+      text-align: left;
+      margin-left: 1em;
+    }
+
+    .calculation {
+      margin: auto;
+      max-width: 480px;
+    }
+
+
   </style>
 </head>
 
@@ -285,20 +303,28 @@
   <main>
     <div class="aboveFold">
       <h1>COLD HARD CASH</h1>
-      <p>Each Cold Hard Cash (CASH) token depicts the amount of currency that shall be mailed to the corresponding token holder upon request. All shipments will be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
+      <p>Each Cold Hard Cash (CASH) token holder may request that the currency depicted in their token's thumbnail be mailed to them. All shipment costs above the cost of standard domestic postage shall be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
       <p>The reserve price of each auction is based on the following calculation:</p>
-      <code>ETHUSD * ($U + ($L + $G*USDETH)/16)</code>
+      <code>$G/16 + (USDETH * ($U + $L/16))</code>
+
       <p>Where</p>
-      <code>ETHUSD = The ETH/USD exchange rate as of x/x/xx</code>
-      <code>USDETH = The USD/ETH exchange rate as of x/x/xx</code>
-      <code>$U = The nominal value of each piece of physical currency</code>
-      <code>$L = X hours of labor * $15.00 (NYC minimum wage)</code>
-      <code>$G = the gas costs of uploading the contract + setting up the auctions</code>
+      <div class="calculation">
+        <code>USDETH = 0.00064 (USD/ETH exchange rate as of 10/18/2023)</code>
+        <code>$G = Total gas expense of deploying CASH contract + auction initialization</code>
+        <code>$U = The nominal USD value depicted in the NFT thumbnail</code>
+        <code>$L = 17.56 hours of labor * $15.00 (NYC minimum wage)<aside>NOTE: $L is not inclusive of labor undertaken while conceptualizing or planning for the CASH project. In addition, this does it take into account labor directed towards the creation of reusable web and smart contract-based components undertaken prior to the development of the CASH project</aside></code>
+      </div>
+
       <div style="display: flex; justify-content: center;">
         <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow" id="etherscanLink">Etherscan</a></h3>
-        <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow">OpenSea</a></h3>
+        <!-- <h3 style="display: inline-block; padding: 0.5em;"><a href="#" target="_blank" rel="nofollow">OpenSea</a></h3> -->
       </div>
     </div>
+
+
+
+
+    <section id="grid" class="grid"></section>
 
 
     <connect-wallet id="wallet-connect">
@@ -306,19 +332,11 @@
         <div class="center" style="margin:1.5em 0;">
           <label style="cursor: pointer;">
             <input type="checkbox" id="wantsNotifications" style="cursor: pointer;">
-            receive notifications on all new bids
+            receive notifications on all new bids [beta]
           </label>
         </div>
       </section>
     </connect-wallet>
-
-
-
-    <section id="grid" class="grid">
-
-
-    </section>
-
 
 
     <connect-wallet id="wallet-connect">
@@ -356,7 +374,7 @@
     { title: '$1.00', auctionId: 6, url: './auctions/6', img: './assets/6.jpg' },
     { title: '$2.00', auctionId: 7, url: './auctions/7', img: './assets/7.jpg' },
     { title: '$5.00', auctionId: 8, url: './auctions/8', img: './assets/8.jpg' },
-    { title: '$6.71', auctionId: 9, url: './auctions/9', img: './assets/9.jpg' },
+    { title: '$6.67', auctionId: 9, url: './auctions/9', img: './assets/9.jpg' },
     { title: '$10.00', auctionId: 10, url: './auctions/10', img: './assets/10.jpg' },
     { title: '$20.00', auctionId: 11, url: './auctions/11', img: './assets/11.jpg' },
     { title: '$50.00', auctionId: 12, url: './auctions/12', img: './assets/12.jpg' },

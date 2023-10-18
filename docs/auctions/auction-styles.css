@@ -29,6 +29,13 @@ label, label input {
   cursor: pointer;
 }
 
+aside {
+  font-size: 10px;
+  display: block;
+  margin: 0.8em auto;
+  max-width: 450px;
+}
+
 .address {
   font-family: monospace;
   font-weight: bold;
@@ -285,4 +292,14 @@ code {
   text-align: center;
   display: block;
   margin-bottom: 0.5em;
+}
+
+.calculation code {
+  text-align: left;
+  margin-left: 1em;
+}
+
+.calculation {
+  margin: auto;
+  max-width: 480px;
 }
