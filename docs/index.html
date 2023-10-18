@@ -578,21 +578,42 @@ ul#previousBidList {
     )
 
     const [
-      blockNumber,
-      formattedAddr,
-      connectedBalance,
       connectedNetwork,
+      connectedBalance,
+      formattedAddr
+    ] = await Promise.all([
+      provider.getNetwork(),
+      provider.getETHBalance(signerAddr),
+      formatAddr(signerAddr, provider),
+    ])
+
+    let networkName, networkDescriptor
+    if (connectedNetwork.name && connectedNetwork.name !== 'unknown') {
+      networkName = connectedNetwork.chainId === 1 ? 'mainnet' : connectedNetwork.name
+      networkDescriptor = 'Network'
+    } else {
+      networkName = connectedNetwork.chainId
+      networkDescriptor = 'Network ID'
+    }
+
+    $connectedNetwork.innerHTML = `${networkDescriptor}: ${networkName}`
+
+    $connectedAs.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${signerAddr}" target="_blank" class="address">${
+      isENS(formattedAddr) ? formattedAddr : await formatAddr(signerAddr, provider)
+    }</a>`
+    $connectedBalance.innerHTML = `Balance: ${ethVal(connectedBalance)} ETH`
+
+
+    const [
+      blockNumber,
       unsortedBidsMade,
       ethUsd
     ] = await Promise.all([
       provider.provider.getBlockNumber(),
-      formatAddr(signerAddr, provider),
-      provider.getETHBalance(signerAddr),
-      provider.getNetwork(),
       bidRequest,
       getEthUsd(uniswapV2)
 
-    ])
+    ]).catch(e => console.log(e))
 
     const block = await provider.provider.getBlock(blockNumber)
     const timeDiff = Date.now() - block.timestamp*1000
@@ -685,21 +706,7 @@ ul#previousBidList {
 
     $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(block.timestamp*1000)}<br>[Block: ${blockNumber}]<br><strong><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a></strong>`
 
-    $connectedAs.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${signerAddr}" target="_blank" class="address">${
-      isENS(formattedAddr) ? formattedAddr : await formatAddr(signerAddr, provider)
-    }</a>`
-    $connectedBalance.innerHTML = `Balance: ${ethVal(connectedBalance)} ETH`
 
-    let networkName, networkDescriptor
-    if (connectedNetwork.name && connectedNetwork.name !== 'unknown') {
-      networkName = connectedNetwork.chainId === 1 ? 'mainnet' : connectedNetwork.name
-      networkDescriptor = 'Network'
-    } else {
-      networkName = connectedNetwork.chainId
-      networkDescriptor = 'Network ID'
-    }
-
-    $connectedNetwork.innerHTML = `${networkDescriptor}: ${networkName}`
 
     const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
 

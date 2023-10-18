@@ -158,38 +158,17 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
   )
 
   const signerAddr = await signer.getAddress()
+
   const [
-    highestBid,
-    auction,
-    auctionEndTime,
-    isActive,
-    isSettled,
-    blockNumber,
-    formattedAddr,
-    unsortedBidsMade,
     connectedBalance,
     connectedNetwork,
-    ethUsd
+    formattedAddr,
   ] = await Promise.all([
-    steviepAuction.auctionIdToHighestBid(AUCTION_ID + 16),
-    steviepAuction.auctionIdToAuction(AUCTION_ID + 16),
-    steviepAuction.auctionEndTime(AUCTION_ID + 16),
-    steviepAuction.isActive(AUCTION_ID + 16),
-    steviepAuction.isSettled(AUCTION_ID + 16),
-    provider.provider.getBlockNumber(),
-    formatAddr(signerAddr, provider),
-    bidRequest,
     provider.getETHBalance(signerAddr),
     provider.getNetwork(),
-    getEthUsd(uniswapV2)
+    formatAddr(signerAddr, provider),
   ])
 
-
-  const hasBid = !!bnToN(highestBid.timestamp)
-  const blockTimestamp = (await provider.provider.getBlock(blockNumber)).timestamp
-  const timeDiff = Date.now() - blockTimestamp*1000
-
-  $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]<br><strong><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a></strong>`
   if (isENS(formattedAddr)) {
     $connectedAs1.innerHTML = formattedAddr
   }
@@ -206,6 +185,33 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
   }
 
   $connectedNetwork.innerHTML = `${networkDescriptor}: ${networkName}`
+
+  const [
+    highestBid,
+    auction,
+    auctionEndTime,
+    isActive,
+    isSettled,
+    blockNumber,
+    unsortedBidsMade,
+    ethUsd
+  ] = await Promise.all([
+    steviepAuction.auctionIdToHighestBid(AUCTION_ID + 16),
+    steviepAuction.auctionIdToAuction(AUCTION_ID + 16),
+    steviepAuction.auctionEndTime(AUCTION_ID + 16),
+    steviepAuction.isActive(AUCTION_ID + 16),
+    steviepAuction.isSettled(AUCTION_ID + 16),
+    provider.provider.getBlockNumber(),
+    bidRequest,
+    getEthUsd(uniswapV2)
+  ])
+
+
+  const hasBid = !!bnToN(highestBid.timestamp)
+  const blockTimestamp = (await provider.provider.getBlock(blockNumber)).timestamp
+  const timeDiff = Date.now() - blockTimestamp*1000
+
+  $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]<br><strong><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a></strong>`
 
   const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
 
