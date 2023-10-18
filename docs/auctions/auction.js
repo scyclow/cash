@@ -148,7 +148,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
       rawBids.map(
         async e => ({
           bidder: e.args.bidder,
-          bidderDisplay: await formatAddr(e.args.bidder),
+          bidderDisplay: await formatAddr(e.args.bidder, provider),
           amount: ethVal(e.args.amount),
           auctionId: bnToN(e.args.auctionId),
           timestamp: bnToN(e.args.timestamp),
