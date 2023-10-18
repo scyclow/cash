@@ -275,6 +275,30 @@
     }
 
 
+
+
+ul#previousBidList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+
+.bidHistoryItem {
+  margin: 1em 0;
+  border-bottom: 1px dashed;
+  padding-bottom: 0.5em;
+}
+.bidHistoryItem * {
+  font-family: monospace;
+}
+
+
+.bidHistoryRow {
+  display: flex;
+  justify-content: space-between;
+}
+
   </style>
 </head>
 
@@ -338,9 +362,19 @@
       </section>
     </connect-wallet>
 
+    <connect-wallet id="wallet-connect">
+      <section slot="connected" class="center" style="text-align: left;">
+        <section id="bidHistory" class="bidSection">
+          <h3 class="label">All Bids</h3>
+          <ul id="previousBidList"></ul>
+        </section>
+      </section>
+    </connect-wallet>
 
     <connect-wallet id="wallet-connect">
       <section slot="connected" class="center" style="text-align: left;">
+
+
 
         <section class="bidSection lastUpdatedSection">
           <h3 class="label">DATA LAST UPDATED:</h3>
@@ -484,7 +518,8 @@
   const $connectedNetwork = $.id('connectedNetwork')
   const $etherscanLink = $.id('etherscanLink')
   const $wantsNotifications = $.id('wantsNotifications')
-
+  const $bidHistory = $.id('bidHistory')
+  const $previousBidList = $.id('previousBidList')
 
   $etherscanLink.href = `https://${etherscanPrefix}etherscan.io/address/${COLD_HARD_CASH}`
 
@@ -526,16 +561,37 @@
   async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     const signerAddr = await signer.getAddress()
 
+    const bidFilter = steviepAuction.filters.BidMade()
+
+    const bidRequest = steviepAuction.queryFilter(bidFilter).then(rawBids =>
+      Promise.all(
+        rawBids.map(
+          async e => ({
+            bidder: e.args.bidder,
+            bidderDisplay: await formatAddr(e.args.bidder, provider),
+            amount: ethVal(e.args.amount),
+            auctionId: bnToN(e.args.auctionId),
+            timestamp: bnToN(e.args.timestamp),
+          })
+        )
+      )
+    )
+
     const [
       blockNumber,
       formattedAddr,
       connectedBalance,
-      connectedNetwork
+      connectedNetwork,
+      unsortedBidsMade,
+      ethUsd
     ] = await Promise.all([
       provider.provider.getBlockNumber(),
       formatAddr(signerAddr, provider),
       provider.getETHBalance(signerAddr),
-      provider.getNetwork()
+      provider.getNetwork(),
+      bidRequest,
+      getEthUsd(uniswapV2)
+
     ])
 
     const block = await provider.provider.getBlock(blockNumber)
@@ -549,13 +605,11 @@
         auction,
         auctionEndTime,
         isActive,
-        ethUsd
       ] = await Promise.all([
         steviepAuction.auctionIdToHighestBid(a.auctionId),
         steviepAuction.auctionIdToAuction(a.auctionId),
         steviepAuction.auctionEndTime(a.auctionId),
         steviepAuction.isActive(a.auctionId),
-        getEthUsd(uniswapV2)
       ])
 
       const reservePrice = ethVal(auction.minBid)
@@ -647,6 +701,28 @@
 
     $connectedNetwork.innerHTML = `${networkDescriptor}: ${networkName}`
 
+    const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
+
+    if (bidsMade.length) {
+      $previousBidList.innerHTML = bidsMade
+      .filter(bid => bid.auctionId >= 16 && bid.auctionId < 32)
+      .map(bid => {
+        const bidAmount = Number(bid.amount.toFixed(14))
+        const bidAmountUSD = (bidAmount * ethUsd).toFixed(2)
+        const bidAmountPretty = String(bidAmount).includes('.') ? bidAmount : bidAmount.toFixed(1)
+        return `
+          <li class="bidHistoryItem">
+            <div class="bidHistoryRow">
+              <div>BID: ${bidAmountPretty} ETH (~$${bidAmountUSD})</div>
+              <div>
+                <a href="https://${etherscanPrefix}etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
+              </div>
+            </div>
+            <div>${new Date(bid.timestamp * 1000)}</div>
+          </li>
+        `
+      }).join('')
+    }
   }
 
   provider.onConnect(async () => {
