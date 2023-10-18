@@ -1,20 +1,20 @@
 const auctionData = [
-  { title: '$0.00', auctionId: 0, url: './auctions/0', img: './assets/0.jpg' },
-  { title: '$0.01', auctionId: 1, url: './auctions/1', img: './assets/1.jpg' },
-  { title: '$0.05', auctionId: 2, url: './auctions/2', img: './assets/2.jpg' },
-  { title: '$0.10', auctionId: 3, url: './auctions/3', img: './assets/3.jpg' },
-  { title: '$0.25', auctionId: 4, url: './auctions/4', img: './assets/4.jpg' },
-  { title: '$0.50', auctionId: 5, url: './auctions/5', img: './assets/5.jpg' },
-  { title: '$1.00', auctionId: 6, url: './auctions/6', img: './assets/6.jpg' },
-  { title: '$2.00', auctionId: 7, url: './auctions/7', img: './assets/7.jpg' },
-  { title: '$5.00', auctionId: 8, url: './auctions/8', img: './assets/8.jpg' },
-  { title: '$6.67', auctionId: 9, url: './auctions/9', img: './assets/9.jpg' },
-  { title: '$10.00', auctionId: 10, url: './auctions/10', img: './assets/10.jpg' },
-  { title: '$20.00', auctionId: 11, url: './auctions/11', img: './assets/11.jpg' },
-  { title: '$50.00', auctionId: 12, url: './auctions/12', img: './assets/12.jpg' },
-  { title: '$50.32', auctionId: 13, url: './auctions/13', img: './assets/13.jpg' },
-  { title: '$100.00', auctionId: 14, url: './auctions/14', img: './assets/14.jpg' },
-  { title: '$???.??', auctionId: 15, url: './auctions/15', img: './assets/15.jpg' },
+  { title: '$0.00', tokenId: 0, url: './auctions/0', img: './assets/0.jpg' },
+  { title: '$0.01', tokenId: 1, url: './auctions/1', img: './assets/1.jpg' },
+  { title: '$0.05', tokenId: 2, url: './auctions/2', img: './assets/2.jpg' },
+  { title: '$0.10', tokenId: 3, url: './auctions/3', img: './assets/3.jpg' },
+  { title: '$0.25', tokenId: 4, url: './auctions/4', img: './assets/4.jpg' },
+  { title: '$0.50', tokenId: 5, url: './auctions/5', img: './assets/5.jpg' },
+  { title: '$1.00', tokenId: 6, url: './auctions/6', img: './assets/6.jpg' },
+  { title: '$2.00', tokenId: 7, url: './auctions/7', img: './assets/7.jpg' },
+  { title: '$5.00', tokenId: 8, url: './auctions/8', img: './assets/8.jpg' },
+  { title: '$6.67', tokenId: 9, url: './auctions/9', img: './assets/9.jpg' },
+  { title: '$10.00', tokenId: 10, url: './auctions/10', img: './assets/10.jpg' },
+  { title: '$20.00', tokenId: 11, url: './auctions/11', img: './assets/11.jpg' },
+  { title: '$50.00', tokenId: 12, url: './auctions/12', img: './assets/12.jpg' },
+  { title: '$50.32', tokenId: 13, url: './auctions/13', img: './assets/13.jpg' },
+  { title: '$100.00', tokenId: 14, url: './auctions/14', img: './assets/14.jpg' },
+  { title: '$???.??', tokenId: 15, url: './auctions/15', img: './assets/15.jpg' },
 ]
 
 const provider = new Web3Provider()
@@ -23,7 +23,7 @@ mountComponents(
   ConnectButton(provider),
 )
 
-const network = 'goerli'
+const network = 'mainnet'
 
 const etherscanPrefix = network === 'goerli' ? 'goerli.' : ''
 
@@ -31,6 +31,7 @@ const etherscanPrefix = network === 'goerli' ? 'goerli.' : ''
     // local: '0x46d4674578a2daBbD0CEAB0500c6c7867999db34'
     local: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
     goerli: '0x39665bCA42F60413b2E162a24a2FE1B290F5a2f9',
+    mainnet: '0xd577B12732DA7557Db7eeA82e53d605f42C618d8',
   }[network]
 
   const UNISWAP_V2 = {
@@ -79,7 +80,7 @@ const allowListContractABI = [
 
 const rawSteviepAuction = provider.rawContract(STEVIEP_AUCTION, auctionABI)
 
-const bidFilter = rawSteviepAuction.filters.BidMade(AUCTION_ID)
+const bidFilter = rawSteviepAuction.filters.BidMade(AUCTION_ID + 16)
 
 
 const $lastUpdated = $.id('lastUpdated')
@@ -170,11 +171,11 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     connectedNetwork,
     ethUsd
   ] = await Promise.all([
-    steviepAuction.auctionIdToHighestBid(AUCTION_ID),
-    steviepAuction.auctionIdToAuction(AUCTION_ID),
-    steviepAuction.auctionEndTime(AUCTION_ID),
-    steviepAuction.isActive(AUCTION_ID),
-    steviepAuction.isSettled(AUCTION_ID),
+    steviepAuction.auctionIdToHighestBid(AUCTION_ID + 16),
+    steviepAuction.auctionIdToAuction(AUCTION_ID + 16),
+    steviepAuction.auctionEndTime(AUCTION_ID + 16),
+    steviepAuction.isActive(AUCTION_ID + 16),
+    steviepAuction.isSettled(AUCTION_ID + 16),
     provider.provider.getBlockNumber(),
     formatAddr(signerAddr, provider),
     bidRequest,
@@ -369,8 +370,8 @@ provider.onConnect(async () => {
 
     try {
       const [highestBid, auction] = await Promise.all([
-        steviepAuction.auctionIdToHighestBid(AUCTION_ID),
-        steviepAuction.auctionIdToAuction(AUCTION_ID),
+        steviepAuction.auctionIdToHighestBid(AUCTION_ID + 16),
+        steviepAuction.auctionIdToAuction(AUCTION_ID + 16),
       ])
 
       const minBid = highestBid.amount
@@ -383,7 +384,7 @@ provider.onConnect(async () => {
 
       const $wantsReward = $.id('wantsReward')
       const wantsReward = $wantsReward && $wantsReward.checked
-      const tx = await rawSteviepAuction.connect(provider.signer).bid(AUCTION_ID, wantsReward, ethValue($newBidAmount.value))
+      const tx = await rawSteviepAuction.connect(provider.signer).bid(AUCTION_ID + 16, wantsReward, ethValue($newBidAmount.value))
 
       $bidSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://${etherscanPrefix}etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
 
@@ -393,7 +394,7 @@ provider.onConnect(async () => {
       updateBidInfo(provider.signer, steviepAuction, uniswapV2)
 
       const auctionsBidOn = ls.get('__AUCTIONS_BID_ON__') || {}
-      auctionsBidOn[AUCTION_ID] = true
+      auctionsBidOn[AUCTION_ID + 16] = true
       ls.set('__AUCTIONS_BID_ON__', JSON.stringify(auctionsBidOn))
 
       unhide($bidSectionContent)
@@ -419,7 +420,7 @@ provider.onConnect(async () => {
     $settlementSectionLoadingMessage.innerHTML = 'Submitting...'
 
     try {
-      const tx = await rawSteviepAuction.connect(provider.signer).settle(AUCTION_ID)
+      const tx = await rawSteviepAuction.connect(provider.signer).settle(AUCTION_ID + 16)
 
       $settlementSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://${etherscanPrefix}etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
 

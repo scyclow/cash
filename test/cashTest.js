@@ -31,7 +31,7 @@ const createGenericAuction = () => SteviepAuction.connect(admin).create(false, O
 const contractBalance = contract => contract.provider.getBalance(contract.address)
 
 let admin, bidder1, bidder2
-let SteviepAuction, ColdHardCash, FastCashMoneyPlus
+let SteviepAuction, ColdHardCash, FastCashMoneyPlus, TokenURIv2
 
 
 const auctionSetup = async () => {
@@ -63,6 +63,10 @@ const auctionSetup = async () => {
     ],
     '0xcA5228D1fe52D22db85E02CA305cddD9E573D752'
   )
+
+  const TokenURIv2Factory = await ethers.getContractFactory('TokenURIv2', admin)
+  TokenURIv2 = await TokenURIv2Factory.deploy()
+  await TokenURIv2.deployed()
 
   await ColdHardCash.connect(admin).setMinter(SteviepAuction.address)
   await FastCashBidReward.connect(admin).setMinter(SteviepAuction.address)
@@ -179,6 +183,10 @@ describe('SteviepAuction', () => {
       expect(uri0.attributes[1].value).to.equal('100000000000000000 wei')
       expect(uri3.attributes[1].value).to.equal('123450000000000000 wei')
       expect(ethVal(await FastCashMoneyPlus.connect(admin).balanceOf(bidder1.address))).to.equal(2)
+
+      await ColdHardCash.connect(admin).setURIContract(TokenURIv2.address)
+      expect(await ColdHardCash.connect(admin).tokenURIContract()).to.equal(TokenURIv2.address)
+
     })
   })
 
