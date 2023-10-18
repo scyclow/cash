@@ -31,6 +31,16 @@ a:hover {
   text-decoration: none;
 }
 
+::selection {
+  color: #fcfbf5;
+  background-color: #20251f;
+}
+
+.nightmode ::selection {
+  color: #20251f;
+  background-color: #fcfbf5;
+}
+
 .nightmode * {
   color: #f6fcf5;
 }
