@@ -322,33 +322,34 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
       <li>All bids must be made in ETH.</li>
     </ul>
   `
+console.log(auction.rewardContract, auction.allowListContract)
 
-  if (auction.allowListContract !== ZERO_ADDR) {
-    const allowList = await provider.contract(auction.allowListContract, allowListContractABI)
+  // if (auction.allowListContract !== ZERO_ADDR) {
+  //   const allowList = await provider.contract(auction.allowListContract, allowListContractABI)
 
-    if (bnToN(await allowList.balanceOf(signerAddr)) === 0) {
-      $bidderSecondaryInfo.innerHTML = 'You must own at least 1 Free token to bid'
-      $submitBid.disabled = true
-    } else {
+  //   if (bnToN(await allowList.balanceOf(signerAddr)) === 0) {
+  //     $bidderSecondaryInfo.innerHTML = 'You must own at least 1 Free token to bid'
+  //     $submitBid.disabled = true
+  //   } else {
       $submitBid.disabled = false
       if (auction.rewardContract !== ZERO_ADDR) {
         const $wantsReward = $.id('wantsReward')
         const checked = !$wantsReward || $wantsReward.checked
-
         $bidderSecondaryInfo.innerHTML = `
           <label>
             Recieve 1 FastCash per bid: <input id="wantsReward" type="checkbox" ${checked ? 'checked' : ''}>
           </label>
         `
+
       } else {
         $bidderSecondaryInfo.innerHTML = ''
       }
 
-    }
-  } else {
-    $bidderSecondaryInfo.innerHTML = ''
-    $submitBid.disabled = false
-  }
+  //   }
+  // } else {
+  //   $bidderSecondaryInfo.innerHTML = ''
+  //   $submitBid.disabled = false
+  // }
 
 
 }
