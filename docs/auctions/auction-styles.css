@@ -303,3 +303,7 @@ code {
   margin: auto;
   max-width: 480px;
 }
+
+.nightmode .imgContainer img {
+  box-shadow: 1px 1px 8px #e8f2e5;
+}
