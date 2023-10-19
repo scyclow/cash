@@ -654,7 +654,7 @@ ul#previousBidList {
         $highestBid.innerHTML = `Highest Bid: ${bidAmount} ETH (~$${(bidAmount * ethUsd).toFixed(2)})` + (endingSoon ? ' [ENDING SOON]' : '')
         if (activeCountdownIntervals[a.auctionId]) activeCountdownIntervals[a.auctionId]()
 
-        $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider)}</a>`
+        $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, true, 31)}</a>`
 
       // `Reserve: ${reservePrice} ETH (~$${(reservePrice * ethUsd).toFixed(2)})`
 
@@ -789,12 +789,12 @@ ul#previousBidList {
   function isENS(ens) {
     return ens.slice(-4) === '.eth'
   }
-  async function formatAddr(addr, provider, truncate=true) {
+  async function formatAddr(addr, provider, truncate=true, nameLength=19) {
     try {
       const ens = await provider.getENS(addr)
       if (ens.slice(-4) === '.eth') {
-        return ens.length > 19
-          ? ens.slice(0, 16) + '...'
+        return ens.length > nameLength
+          ? ens.slice(0, nameLength-3) + '...'
           : ens
       } else {
         return truncate ? truncateAddr(addr) : addr
