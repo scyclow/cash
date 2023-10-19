@@ -579,22 +579,6 @@ ul#previousBidList {
   async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     const signerAddr = await signer.getAddress()
 
-    const bidFilter = steviepAuction.filters.BidMade()
-
-    const bidRequest = steviepAuction.queryFilter(bidFilter).then(rawBids =>
-      Promise.all(
-        rawBids.map(
-          async e => ({
-            bidder: e.args.bidder,
-            bidderDisplay: await formatAddr(e.args.bidder, provider),
-            amount: ethVal(e.args.amount),
-            auctionId: bnToN(e.args.auctionId),
-            timestamp: bnToN(e.args.timestamp),
-          })
-        )
-      )
-    )
-
     const [
       connectedNetwork,
       connectedBalance,
@@ -624,11 +608,9 @@ ul#previousBidList {
 
     const [
       blockNumber,
-      unsortedBidsMade,
       ethUsd
     ] = await Promise.all([
       provider.provider.getBlockNumber(),
-      bidRequest,
       getEthUsd(uniswapV2)
 
     ]).catch(e => console.log(e))
@@ -726,28 +708,49 @@ ul#previousBidList {
 
 
 
-    const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
 
-    if (bidsMade.length) {
-      $previousBidList.innerHTML = bidsMade
-      .filter(bid => bid.auctionId >= 16 && bid.auctionId < 32)
-      .map(bid => {
-        const bidAmount = Number(bid.amount.toFixed(14))
-        const bidAmountUSD = (bidAmount * ethUsd).toFixed(2)
-        const bidAmountPretty = String(bidAmount).includes('.') ? bidAmount : bidAmount.toFixed(1)
-        return `
-          <li class="bidHistoryItem">
-            <div class="bidHistoryRow">
-              <strong>${auctionMap[bid.auctionId]}</strong>
-              <div>${bidAmountPretty} ETH (~$${bidAmountUSD})</div>
-              <div>
-                <a href="https://${etherscanPrefix}etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
+    try {
+      const bidFilter = steviepAuction.filters.BidMade()
+
+      const unsortedBidsMade = await steviepAuction.queryFilter(bidFilter).then(rawBids =>
+        Promise.all(
+          rawBids.map(
+            async e => ({
+              bidder: e.args.bidder,
+              bidderDisplay: await formatAddr(e.args.bidder, provider),
+              amount: ethVal(e.args.amount),
+              auctionId: bnToN(e.args.auctionId),
+              timestamp: bnToN(e.args.timestamp),
+            })
+          )
+        )
+      )
+
+      const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
+
+      if (bidsMade.length) {
+        $previousBidList.innerHTML = bidsMade
+        .filter(bid => bid.auctionId >= 16 && bid.auctionId < 32)
+        .map(bid => {
+          const bidAmount = Number(bid.amount.toFixed(14))
+          const bidAmountUSD = (bidAmount * ethUsd).toFixed(2)
+          const bidAmountPretty = String(bidAmount).includes('.') ? bidAmount : bidAmount.toFixed(1)
+          return `
+            <li class="bidHistoryItem">
+              <div class="bidHistoryRow">
+                <strong>${auctionMap[bid.auctionId]}</strong>
+                <div>${bidAmountPretty} ETH (~$${bidAmountUSD})</div>
+                <div>
+                  <a href="https://${etherscanPrefix}etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
+                </div>
               </div>
-            </div>
-            <div>${new Date(bid.timestamp * 1000)}</div>
-          </li>
-        `
-      }).join('')
+              <div>${new Date(bid.timestamp * 1000)}</div>
+            </li>
+          `
+        }).join('')
+      }
+    } catch (e) {
+      console.error(e)
     }
   }
 

@@ -143,19 +143,7 @@ if ($wantsNotifications) $wantsNotifications.onclick = () => {
 let stopActiveCountdownInterval = () => {}
 let setMinBid = false
 async function updateBidInfo(signer, steviepAuction, uniswapV2) {
-  const bidRequest = rawSteviepAuction.queryFilter(bidFilter).then(rawBids =>
-    Promise.all(
-      rawBids.map(
-        async e => ({
-          bidder: e.args.bidder,
-          bidderDisplay: await formatAddr(e.args.bidder, provider),
-          amount: ethVal(e.args.amount),
-          auctionId: bnToN(e.args.auctionId),
-          timestamp: bnToN(e.args.timestamp),
-        })
-      )
-    )
-  )
+
 
   const signerAddr = await signer.getAddress()
 
@@ -193,7 +181,6 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     isActive,
     isSettled,
     blockNumber,
-    unsortedBidsMade,
     ethUsd
   ] = await Promise.all([
     steviepAuction.auctionIdToHighestBid(AUCTION_ID + 16),
@@ -202,7 +189,6 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
     steviepAuction.isActive(AUCTION_ID + 16),
     steviepAuction.isSettled(AUCTION_ID + 16),
     provider.provider.getBlockNumber(),
-    bidRequest,
     getEthUsd(uniswapV2)
   ])
 
@@ -213,7 +199,6 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
 
   $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]<br><strong><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a></strong>`
 
-  const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
 
 
   if (!hasBid) {
@@ -285,25 +270,6 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
   }
   setMinBid = true
 
-  if (bidsMade.length) {
-    $previousBidList.innerHTML = bidsMade.map(bid => {
-      const bidAmount = Number(bid.amount.toFixed(14))
-      const bidAmountUSD = (bidAmount * ethUsd).toFixed(2)
-      const bidAmountPretty = String(bidAmount).includes('.') ? bidAmount : bidAmount.toFixed(1)
-      return `
-        <li class="bidHistoryItem">
-          <div class="bidHistoryRow">
-            <div>BID: ${bidAmountPretty} ETH (~$${bidAmountUSD})</div>
-            <div>
-              <a href="https://${etherscanPrefix}etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
-            </div>
-          </div>
-          <div>${new Date(bid.timestamp * 1000)}</div>
-        </li>
-      `
-    }).join('')
-  }
-
 
   const formatTime = (amt, measurement) => Math.round(amt*100)/100 + ' ' + (amt === 1 ? measurement : measurement + 's')
   const formatDuration = duration =>
@@ -328,7 +294,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
       <li>All bids must be made in ETH.</li>
     </ul>
   `
-console.log(auction.rewardContract, auction.allowListContract)
+
 
   // if (auction.allowListContract !== ZERO_ADDR) {
   //   const allowList = await provider.contract(auction.allowListContract, allowListContractABI)
@@ -357,6 +323,44 @@ console.log(auction.rewardContract, auction.allowListContract)
   //   $submitBid.disabled = false
   // }
 
+
+  try {
+    const unsortedBidsMade = await rawSteviepAuction.queryFilter(bidFilter).then(rawBids =>
+      Promise.all(
+        rawBids.map(
+          async e => ({
+            bidder: e.args.bidder,
+            bidderDisplay: await formatAddr(e.args.bidder, provider),
+            amount: ethVal(e.args.amount),
+            auctionId: bnToN(e.args.auctionId),
+            timestamp: bnToN(e.args.timestamp),
+          })
+        )
+      )
+    )
+
+    const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
+    if (bidsMade.length) {
+      $previousBidList.innerHTML = bidsMade.map(bid => {
+        const bidAmount = Number(bid.amount.toFixed(14))
+        const bidAmountUSD = (bidAmount * ethUsd).toFixed(2)
+        const bidAmountPretty = String(bidAmount).includes('.') ? bidAmount : bidAmount.toFixed(1)
+        return `
+          <li class="bidHistoryItem">
+            <div class="bidHistoryRow">
+              <div>BID: ${bidAmountPretty} ETH (~$${bidAmountUSD})</div>
+              <div>
+                <a href="https://${etherscanPrefix}etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
+              </div>
+            </div>
+            <div>${new Date(bid.timestamp * 1000)}</div>
+          </li>
+        `
+      }).join('')
+    }
+  } catch (e) {
+    console.error(e)
+  }
 
 }
 
