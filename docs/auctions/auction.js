@@ -217,7 +217,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
 
     const bidAmount = ethVal(highestBid.amount)
     $highestBidAmount.innerHTML = `${bidAmount} ETH <div class="bidUSD">(~$${(bidAmount * ethUsd).toFixed(2)})</div>`
-    $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
+    $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false, 42)}</a>`
 
 
     stopActiveCountdownInterval()
@@ -484,12 +484,12 @@ function formatMinBid(amt) {
 function isENS(ens) {
   return ens.slice(-4) === '.eth'
 }
-async function formatAddr(addr, provider, truncate=true) {
+async function formatAddr(addr, provider, truncate=true, nameLength=19) {
   try {
     const ens = await provider.getENS(addr)
     if (ens.slice(-4) === '.eth') {
-      return ens.length > 19
-        ? ens.slice(0, 16) + '...'
+      return ens.length > nameLength
+        ? ens.slice(0, nameLength-3) + '...'
         : ens
     } else {
       return truncate ? truncateAddr(addr) : addr
