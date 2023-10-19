@@ -554,6 +554,7 @@ ul#previousBidList {
             <h3>${a.title}</h3>
             <h3 class="auctionInfo" id="timeLeft-${a.auctionId}"></h3>
             <h3 class="auctionInfo" id="highestBid-${a.auctionId}"></h3>
+            <h3 class="auctionInfo" id="highestBidder-${a.auctionId}"></h3>
           </div>
         </div>
       </a>
@@ -645,6 +646,7 @@ ul#previousBidList {
 
       const $highestBid = $.id(`highestBid-${a.auctionId}`)
       const $timeLeft = $.id(`timeLeft-${a.auctionId}`)
+      const $highestBidder = $.id(`highestBidder-${a.auctionId}`)
 
       if (!bidAmount) {
         $highestBid.innerHTML = `Reserve: ${reservePrice} ETH (~$${(reservePrice * ethUsd).toFixed(2)})`
@@ -652,7 +654,12 @@ ul#previousBidList {
         $highestBid.innerHTML = `Highest Bid: ${bidAmount} ETH (~$${(bidAmount * ethUsd).toFixed(2)})` + (endingSoon ? ' [ENDING SOON]' : '')
         if (activeCountdownIntervals[a.auctionId]) activeCountdownIntervals[a.auctionId]()
 
+        $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider)}</a>`
+
+      // `Reserve: ${reservePrice} ETH (~$${(reservePrice * ethUsd).toFixed(2)})`
+
         activeCountdownIntervals[a.auctionId] = triggerTimer(timeLeft, $timeLeft)
+
 
         if (!recentBidMap[a.auctionId]) {
           recentBidMap[a.auctionId] = bidAmount
