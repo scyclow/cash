@@ -679,6 +679,7 @@ ul#previousBidList {
 
       } else {
         $highestBid.innerHTML = `Sold for: ${bidAmount} ETH (~$${(bidAmount * ethUsd).toFixed(2)})`
+        $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, true, 31)}</a>`
       }
     }
 
