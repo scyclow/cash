@@ -130,6 +130,11 @@ button:hover {
 #activeBidSection {
   display: flex;
   justify-content: space-between;
+  flex-direction: column;
+}
+
+#activeBidSection > * {
+  margin: 1em 0;
 }
 
 #highestBidder, #highestBidder a {
@@ -141,7 +146,7 @@ button:hover {
   font-size: 3em;
 }
 
-#highestBidAmount {
+#highestBidAmount, #reserveAmount, #redeemedValue {
   font-size: 2em;
 }
 
@@ -211,11 +216,29 @@ ul#previousBidList {
 }
 
 
+.desktop {
+  display: inherit;
+}
+
+.mobile {
+  display: none;
+}
+
+#osLink {
+  text-align: center;
+}
+
 @media (max-width: 635px) {
+
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: inherit;
+  }
   #activeBidSection {
-    flex-direction: column-reverse;
     max-width: 320px;
-    margin: auto;
   }
   #activeBidSection > * {
     margin: 1em 0;
@@ -229,23 +252,36 @@ ul#previousBidList {
   h1 {
     font-size: 1.5em;
   }
+
+  #highestBidAmount, #reserveAmount, #redeemedValue {
+    font-size: 1.25em;
+  }
+
+  #highestBidder {
+    font-size: 1.25em;
+  }
+  .bidUSD {
+    display: block;
+  }
+  .address {
+    font-size: 0.85em;
+  }
 }
 
 @media (max-width: 370px) {
-  #connectedAs2, .address {
-    font-size: 0.85em;
-  }
+
+
 
   #timeLeft {
     font-size: 2em;
   }
 
-  #highestBidAmount {
-    font-size: 1.5em;
+  #highestBidAmount, #reserveAmount, #redeemedValue {
+    font-size: 1.25em;
   }
 
   #highestBidder {
-    font-size: 0.75em;
+    font-size: 1.25em;
   }
 
   .bidHistoryRow {

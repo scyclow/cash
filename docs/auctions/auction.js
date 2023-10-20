@@ -1,21 +1,8 @@
-const auctionData = [
-  { title: '$0.00', tokenId: 0, url: './auctions/0', img: './assets/0.jpg' },
-  { title: '$0.01', tokenId: 1, url: './auctions/1', img: './assets/1.jpg' },
-  { title: '$0.05', tokenId: 2, url: './auctions/2', img: './assets/2.jpg' },
-  { title: '$0.10', tokenId: 3, url: './auctions/3', img: './assets/3.jpg' },
-  { title: '$0.25', tokenId: 4, url: './auctions/4', img: './assets/4.jpg' },
-  { title: '$0.50', tokenId: 5, url: './auctions/5', img: './assets/5.jpg' },
-  { title: '$1.00', tokenId: 6, url: './auctions/6', img: './assets/6.jpg' },
-  { title: '$2.00', tokenId: 7, url: './auctions/7', img: './assets/7.jpg' },
-  { title: '$5.00', tokenId: 8, url: './auctions/8', img: './assets/8.jpg' },
-  { title: '$6.67', tokenId: 9, url: './auctions/9', img: './assets/9.jpg' },
-  { title: '$10.00', tokenId: 10, url: './auctions/10', img: './assets/10.jpg' },
-  { title: '$20.00', tokenId: 11, url: './auctions/11', img: './assets/11.jpg' },
-  { title: '$50.00', tokenId: 12, url: './auctions/12', img: './assets/12.jpg' },
-  { title: '$50.32', tokenId: 13, url: './auctions/13', img: './assets/13.jpg' },
-  { title: '$100.00', tokenId: 14, url: './auctions/14', img: './assets/14.jpg' },
-  { title: '$???.??', tokenId: 15, url: './auctions/15', img: './assets/15.jpg' },
-]
+  const ETHUSD = 1566.61
+
+  const auctionData = ALL_AUCTIONS
+
+
 
 const provider = new Web3Provider()
 mountComponents(
@@ -83,19 +70,19 @@ const rawSteviepAuction = provider.rawContract(STEVIEP_AUCTION, auctionABI)
 const bidFilter = rawSteviepAuction.filters.BidMade(AUCTION_ID + 16)
 
 
-const $lastUpdated = $.id('lastUpdated')
-const $connectedAs1 = $.id('connectedAs1')
-const $connectedAs2 = $.id('connectedAs2')
-const $connectedBalance = $.id('connectedBalance')
-const $connectedNetwork = $.id('connectedNetwork')
-const $submitBid = $.id('submitBid')
-const $newBidAmount = $.id('newBidAmount')
-const $timeLeftSection = $.id('timeLeftSection')
+// const $lastUpdated = $.id('lastUpdated')
+// const $connectedAs1 = $.id('connectedAs1')
+// const $connectedAs2 = $.id('connectedAs2')
+// const $connectedBalance = $.id('connectedBalance')
+// const $connectedNetwork = $.id('connectedNetwork')
+// const $submitBid = $.id('submitBid')
+// const $newBidAmount = $.id('newBidAmount')
+// const $timeLeftSection = $.id('timeLeftSection')
 const $activeBidSection = $.id('activeBidSection')
 const $highestBidSection = $.id('highestBidSection')
-const $makeBidSection = $.id('makeBidSection')
-const $timeLeft = $.id('timeLeft')
-const $timeDiff = $.id('timeDiff')
+// const $makeBidSection = $.id('makeBidSection')
+// const $timeLeft = $.id('timeLeft')
+// const $timeDiff = $.id('timeDiff')
 const $bidSectionContent = $.id('bidSectionContent')
 const $bidSectionError = $.id('bidSectionError')
 const $bidSectionLoadingMessage = $.id('bidSectionLoadingMessage')
@@ -114,13 +101,21 @@ const $settlementSectionError = $.id('settlementSectionError')
 const $settlementSectionLoading = $.id('settlementSectionLoading')
 const $settlementSectionLoadingMessage = $.id('settlementSectionLoadingMessage')
 
-const $question = $.id('question')
-const $answer = $.id('answer')
-const $answerX = $.id('answerX')
-const $answerContent = $.id('answerContent')
+
+
+const $reserveSection = $.id('reserveSection')
+const $reserveLabel = $.id('reserveLabel')
+const $reserveAmount = $.id('reserveAmount')
+const $redeemedValue = $.id('redeemedValue')
+const $osLink = $.id('osLink')
+
+// const $question = $.id('question')
+// const $answer = $.id('answer')
+// const $answerX = $.id('answerX')
+// const $answerContent = $.id('answerContent')
 
 const $biddingHelp = $.id('biddingHelp')
-const $wantsNotifications = $.id('wantsNotifications')
+// const $wantsNotifications = $.id('wantsNotifications')
 
 
 $.cls('imgContainer')[0].innerHTML = `
@@ -130,220 +125,48 @@ $.cls('imgContainer')[0].innerHTML = `
 `
 
 
+
+$osLink.innerHTML = `<a href="https://opensea.io/assets/ethereum/0x6dea3f6f1bf5ce6606054baabf5452726fe4dea1/${AUCTION_ID}" target="_blank" rel="nofollow">View on OpenSea</a>`
+
+
 let notificationPermission, lastBid
 
-if ($wantsNotifications) $wantsNotifications.onclick = () => {
-  if ($wantsNotifications.checked) {
-    notificationPermission = Notification.requestPermission()
-  } else {
-    notificationPermission = false
-  }
-}
+// if ($wantsNotifications) $wantsNotifications.onclick = () => {
+//   if ($wantsNotifications.checked) {
+//     notificationPermission = Notification.requestPermission()
+//   } else {
+//     notificationPermission = false
+//   }
+// }
 
 let stopActiveCountdownInterval = () => {}
 let setMinBid = false
-async function updateBidInfo(signer, steviepAuction, uniswapV2) {
 
 
-  const signerAddr = await signer.getAddress()
-
-  const [
-    connectedBalance,
-    connectedNetwork,
-    formattedAddr,
-  ] = await Promise.all([
-    provider.getETHBalance(signerAddr),
-    provider.getNetwork(),
-    formatAddr(signerAddr, provider),
-  ])
-
-  if (isENS(formattedAddr)) {
-    $connectedAs1.innerHTML = formattedAddr
-  }
-  $connectedAs2.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${signerAddr}" target="_blank" class="address">${signerAddr}</a>`
-  $connectedBalance.innerHTML = `Balance: ${ethVal(connectedBalance)} ETH`
-
-  let networkName, networkDescriptor
-  if (connectedNetwork.name && connectedNetwork.name !== 'unknown') {
-    networkName = connectedNetwork.chainId === 1 ? 'mainnet' : connectedNetwork.name
-    networkDescriptor = 'Network'
-  } else {
-    networkName = connectedNetwork.chainId
-    networkDescriptor = 'Network ID'
-  }
-
-  $connectedNetwork.innerHTML = `${networkDescriptor}: ${networkName}`
-
-  const [
-    highestBid,
-    auction,
-    auctionEndTime,
-    isActive,
-    isSettled,
-    blockNumber,
-    ethUsd
-  ] = await Promise.all([
-    steviepAuction.auctionIdToHighestBid(AUCTION_ID + 16),
-    steviepAuction.auctionIdToAuction(AUCTION_ID + 16),
-    steviepAuction.auctionEndTime(AUCTION_ID + 16),
-    steviepAuction.isActive(AUCTION_ID + 16),
-    steviepAuction.isSettled(AUCTION_ID + 16),
-    provider.provider.getBlockNumber(),
-    getEthUsd(uniswapV2)
-  ])
+const AUCTION = ALL_AUCTIONS.find(a => a.auctionId - 16 === AUCTION_ID)
 
 
-  const hasBid = !!bnToN(highestBid.timestamp)
-  const blockTimestamp = (await provider.provider.getBlock(blockNumber)).timestamp
-  const timeDiff = Date.now() - blockTimestamp*1000
+  $highestBidLabel.innerHTML = 'WINNING BID'
+    $highestBidAmount.innerHTML = AUCTION.bidAmount + ' ETH' + ` <div class="bidUSD">(~$${(AUCTION.bidAmount * ETHUSD).toFixed(2)})`
+    $highestBidder.innerHTML = `
+      <a href="https://etherscan.io/address/${AUCTION.highestBidderAddr}" target="_blank">
+        <span class="address mobile">${formatAddrOffline(AUCTION.highestBidderAddr)}</span>
+        <span class="address desktop">${AUCTION.highestBidderAddr}</span>
+      </a>
+    `
 
-  $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(blockTimestamp*1000)}<br>[Block: ${blockNumber}]<br><strong><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a></strong>`
-
-
-
-  if (!hasBid) {
-    hide($bidHistory)
-    unhide($makeBidSection)
-
-    if (!setMinBid) $newBidAmount.value = formatMinBid(ethVal(auction.minBid))
-
-  } else if (isActive) {
-    unhide($makeBidSection)
-    unhide($timeLeftSection)
-    unhide($highestBidSection)
-    unhide($activeBidSection)
-    unhide($bidHistory)
-    if (!setMinBid) $newBidAmount.value = formatMinBid(ethVal(highestBid.amount) * (1 + auction.bidIncreaseBps/10000))
-
-    const bidAmount = ethVal(highestBid.amount)
-    $highestBidAmount.innerHTML = `${bidAmount} ETH <div class="bidUSD">(~$${(bidAmount * ethUsd).toFixed(2)})</div>`
-    $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false, 42)}</a>`
+    $reserveAmount.innerHTML = AUCTION.reservePrice + ' ETH' + ` <div class="bidUSD">(~$${(AUCTION.reservePrice * ETHUSD).toFixed(2)})`
 
 
-    stopActiveCountdownInterval()
-    const timeLeft = bnToN(auctionEndTime)*1000 - Date.now()
-    stopActiveCountdownInterval = triggerTimer(timeLeft, $timeLeft)
-    if (timeLeft < 120000) $timeDiff.innerHTML = `*Your web browser is <br>~${Math.abs(timeDiff/1000)} seconds ${timeDiff < 0 ? 'behind' : 'ahead of'} <br>the blockchain`
+    $redeemedValue.innerHTML = `<code style="text-align: left">${AUCTION.redeemed}</code>`
 
-    if (!lastBid) {
-      lastBid = bidAmount
-    } else if (notificationPermission && (bidAmount !== lastBid)) {
-      lastBid = bidAmount
-
-      notificationPermission.then(p => {
-        const notification = new Notification(`💵 New Cold Hard Cash Bid 💵`, {
-          body: `${auctionData[AUCTION_ID].title} → ${bidAmount} ETH`,
-          icon: `../assets/${AUCTION_ID}.jpg`,
-          requireInteraction: true
-        })
-      })
-    } else if (bidAmount !== lastBid) {
-      lastBid = bidAmount
-    }
-
-  } else if (!isActive && !isSettled) {
-    hide($makeBidSection)
-    hide($timeLeftSection)
-    unhide($highestBidSection)
-    unhide($settlementSection)
-    unhide($activeBidSection)
-    unhide($bidHistory)
-
-    $highestBidLabel.innerHTML = 'WINNING BID'
-
-    $highestBidAmount.innerHTML = ethVal(highestBid.amount) + ' ETH'
-    $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
-
-
-  } else if (!isActive && isSettled) {
-    hide($makeBidSection)
-    hide($timeLeftSection)
-    hide($settlementSection)
-    unhide($highestBidSection)
-    unhide($activeBidSection)
-    unhide($bidHistory)
-
-    $highestBidLabel.innerHTML = 'WINNING BID'
-    $highestBidAmount.innerHTML = ethVal(highestBid.amount) + ' ETH'
-    $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, false)}</a>`
-
-  }
-  setMinBid = true
-
-
-  const formatTime = (amt, measurement) => Math.round(amt*100)/100 + ' ' + (amt === 1 ? measurement : measurement + 's')
-  const formatDuration = duration =>
-    duration < 60 ? formatTime(duration, 'second') :
-    duration < 3600 ? formatTime(duration / 60, 'minute') :
-    duration <= 86400 ? formatTime(duration / 3600, 'hour') :
-    formatTime(duration / 86400, 'day')
-
-
-  const auctionLength = formatDuration(auction.duration)
-  const reservePrice = ethVal(auction.minBid)
-  const bidExtension = formatDuration(bnToN(auction.bidTimeExtension))
-  const bidIncrease = bnToN(auction.bidIncreaseBps) / 100 + '%'
-
-  $answerContent.innerHTML = `
-    <ul>
-      <li>This auction has ${reservePrice ? `a reserve price of ${reservePrice} ETH` : 'no reserve price'}.</li>
-      <li>Once the first bid is made, the auction will last ${auctionLength}.</li>
-      <li>All bids made in the final ${bidExtension} will extend the auction.</li>
-      <li>All bids must be ${bidIncrease} higher than the previous bid.</li>
-      <li>Bids cannot be withdrawn once they are made.</li>
-      <li>All bids must be made in ETH.</li>
-    </ul>
-  `
-
-
-  // if (auction.allowListContract !== ZERO_ADDR) {
-  //   const allowList = await provider.contract(auction.allowListContract, allowListContractABI)
-
-  //   if (bnToN(await allowList.balanceOf(signerAddr)) === 0) {
-  //     $bidderSecondaryInfo.innerHTML = 'You must own at least 1 Free token to bid'
-  //     $submitBid.disabled = true
-  //   } else {
-      $submitBid.disabled = false
-      if (auction.rewardContract !== ZERO_ADDR) {
-        const $wantsReward = $.id('wantsReward')
-        const checked = !$wantsReward || $wantsReward.checked
-        $bidderSecondaryInfo.innerHTML = `
-          <label>
-            Recieve 1 FastCash per bid: <input id="wantsReward" type="checkbox" ${checked ? 'checked' : ''}>
-          </label>
-        `
-
-      } else {
-        $bidderSecondaryInfo.innerHTML = ''
-      }
-
-  //   }
-  // } else {
-  //   $bidderSecondaryInfo.innerHTML = ''
-  //   $submitBid.disabled = false
-  // }
-
-
-  try {
-    const unsortedBidsMade = await rawSteviepAuction.queryFilter(bidFilter).then(rawBids =>
-      Promise.all(
-        rawBids.map(
-          async e => ({
-            bidder: e.args.bidder,
-            bidderDisplay: await formatAddr(e.args.bidder, provider),
-            amount: ethVal(e.args.amount),
-            auctionId: bnToN(e.args.auctionId),
-            timestamp: bnToN(e.args.timestamp),
-          })
-        )
-      )
-    )
+    const unsortedBidsMade = ALL_BIDS_MADE.filter(bid => bid.auctionId-16 === AUCTION_ID)
 
     const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
     if (bidsMade.length) {
       $previousBidList.innerHTML = bidsMade.map(bid => {
         const bidAmount = Number(bid.amount.toFixed(14))
-        const bidAmountUSD = (bidAmount * ethUsd).toFixed(2)
+        const bidAmountUSD = (bidAmount * ETHUSD).toFixed(2)
         const bidAmountPretty = String(bidAmount).includes('.') ? bidAmount : bidAmount.toFixed(1)
         return `
           <li class="bidHistoryItem">
@@ -358,115 +181,7 @@ async function updateBidInfo(signer, steviepAuction, uniswapV2) {
         `
       }).join('')
     }
-  } catch (e) {
-    console.error(e)
-  }
 
-}
-
-provider.onConnect(async () => {
-  const steviepAuction = await provider.contract(STEVIEP_AUCTION, auctionABI)
-  const uniswapV2 = await provider.contract(UNISWAP_V2, uniswapV2ABI)
-  const rawSteviepAuction = provider.rawContract(STEVIEP_AUCTION, auctionABI)
-
-  setRunInterval(() => updateBidInfo(provider.signer, steviepAuction, uniswapV2), 3000)
-
-
-  $submitBid.onclick = async () => {
-    hide($bidSectionContent)
-    hide($biddingHelp)
-    unhide($bidSectionLoading)
-    $bidSectionError.innerHTML = ''
-    $bidSectionLoadingMessage.innerHTML = 'Submitting...'
-
-    try {
-      const [highestBid, auction] = await Promise.all([
-        steviepAuction.auctionIdToHighestBid(AUCTION_ID + 16),
-        steviepAuction.auctionIdToAuction(AUCTION_ID + 16),
-      ])
-
-      const minBid = highestBid.amount
-        ? ethVal(highestBid.amount) * (1 + auction.bidIncreaseBps/10000)
-        : ethVal(auction.minBid)
-
-      if ($newBidAmount.value < minBid) {
-        throw new Error(`Bid must be at least ${minBid} ETH`)
-      }
-
-      const $wantsReward = $.id('wantsReward')
-      const wantsReward = $wantsReward && $wantsReward.checked
-      const tx = await rawSteviepAuction.connect(provider.signer).bid(AUCTION_ID + 16, wantsReward, ethValue($newBidAmount.value))
-
-      $bidSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://${etherscanPrefix}etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
-
-      const txReciept1 = await tx.wait(1)
-
-      setMinBid = false
-      updateBidInfo(provider.signer, steviepAuction, uniswapV2)
-
-      const auctionsBidOn = ls.get('__AUCTIONS_BID_ON__') || {}
-      auctionsBidOn[AUCTION_ID + 16] = true
-      ls.set('__AUCTIONS_BID_ON__', JSON.stringify(auctionsBidOn))
-
-      unhide($bidSectionContent)
-      unhide($biddingHelp)
-      hide($bidSectionLoading)
-
-    } catch (e) {
-      unhide($bidSectionContent)
-      hide($bidSectionLoading)
-      if (e.data) {
-        $bidSectionError.innerHTML = e.data.message
-      } else {
-        $bidSectionError.innerHTML = e.message
-      }
-    }
-  }
-
-
-  $submitSettlement.onclick = async () => {
-    hide($settlementSectionContent)
-    unhide($settlementSectionLoading)
-    $settlementSectionError.innerHTML = ''
-    $settlementSectionLoadingMessage.innerHTML = 'Submitting...'
-
-    try {
-      const tx = await rawSteviepAuction.connect(provider.signer).settle(AUCTION_ID + 16)
-
-      $settlementSectionLoadingMessage.innerHTML = `TX Pending. <a href="https://${etherscanPrefix}etherscan.io/tx/${tx.hash}" target="_blank">View on etherscan</a>`
-
-      const txReciept1 = await tx.wait(1)
-
-      updateBidInfo(provider.signer, steviepAuction, uniswapV2)
-
-      unhide($settlementSectionContent)
-      hide($settlementSectionLoading)
-
-    } catch (e) {
-      unhide($settlementSectionContent)
-      hide($settlementSectionLoading)
-      if (e.data) {
-        $settlementSectionError.innerHTML = e.data.message
-      } else {
-        $settlementSectionError.innerHTML = e.message
-      }
-    }
-  }
-})
-
-
-let showingAnswer = false
-$question.onclick = () => {
-  showingAnswer = true
-  hide($question)
-  unhide($answer)
-}
-
-$answerX.onclick = () => {
-  showingAnswer = false
-  unhide($question)
-  hide($answer)
-}
 
 async function getEthUsd(uniswapV2) {
   const decimals = 2
@@ -491,6 +206,20 @@ async function formatAddr(addr, provider, truncate=true, nameLength=19) {
       return ens.length > nameLength
         ? ens.slice(0, nameLength-3) + '...'
         : ens
+    } else {
+      return truncate ? truncateAddr(addr) : addr
+    }
+  } catch (e) {
+    return truncate ? truncateAddr(addr) : addr
+  }
+}
+
+function formatAddrOffline(addr, truncate=true, nameLength=19) {
+  try {
+    if (addr.slice(-4) === '.eth') {
+      return addr.length > nameLength
+        ? addr.slice(0, nameLength-3) + '...'
+        : addr
     } else {
       return truncate ? truncateAddr(addr) : addr
     }

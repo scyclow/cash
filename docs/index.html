@@ -299,34 +299,21 @@ ul#previousBidList {
   justify-content: space-between;
 }
 
+#bidHistory {
+  padding: 1em;
+}
+
   </style>
 </head>
 
 <body>
   <header>
-    <connect-wallet id="wallet-connect" class="connectionSection">
-      <section slot="notConnected">
-        <connect-button>
-          <button slot="button" class="connectButton">Connect Wallet</button>
-          <div slot="loading">Loading...</div>
-          <div slot="error" class="error"></div>
-        </connect-button>
-      </section>
 
-
-      <section slot="connected">
-        <section>
-          <h3 class="label">CONNECTED AS: <span id="connectedAs"></span></h3>
-          <div id="connectedBalance"></div>
-          <div id="connectedNetwork"></div>
-        </section>
-      </section>
-    </connect-wallet>
   </header>
 
   <main>
     <div class="aboveFold">
-      <h1>COLD HARD CASH</h1>
+      <h1>COLD HARD CASH</h1><div id="osLink"></div>
       <p>Each Cold Hard Cash (CASH) token holder may request that the currency depicted in their token's thumbnail be mailed to them. All shipment costs above the cost of standard domestic postage shall be made at the expense of the token holder. The Artist shall not be held liable for any shipments lost in the mail. The Artist shall make a good faith effort to store all physical currency until such mailing takes place, but makes no guarantee on their ability to carry out said shipment. Please contact the Artist directly to arrange a shipment.</p>
       <p>The reserve price of each auction is based on the following calculation:</p>
       <code>$G/16 + (USDETH * ($U + $L/16))</code>
@@ -346,7 +333,7 @@ ul#previousBidList {
     </div>
 
 
-
+<!--
     <connect-wallet id="wallet-connect">
       <section slot="connected">
         <div class="center" style="margin:1.5em 0;">
@@ -356,32 +343,19 @@ ul#previousBidList {
           </label>
         </div>
       </section>
-    </connect-wallet>
+    </connect-wallet> -->
 
     <section id="grid" class="grid"></section>
 
 
-
-    <connect-wallet id="wallet-connect">
-      <section slot="connected" class="center" style="text-align: left;">
+      <section class="center" style="text-align: left;">
         <section id="bidHistory" class="bidSection">
           <h2 style="text-align: center; margin-top: 1em;">All Bids</h2>
           <ul id="previousBidList"></ul>
         </section>
       </section>
-    </connect-wallet>
-
-    <connect-wallet id="wallet-connect">
-      <section slot="connected" class="center" style="text-align: left;">
 
 
-
-        <section class="bidSection lastUpdatedSection">
-          <h3 class="label">DATA LAST UPDATED:</h3>
-          <div id="lastUpdated"></div>
-        </section>
-      </section>
-    </connect-wallet>
 
 
   </main>
@@ -394,28 +368,15 @@ ul#previousBidList {
 <script src="./web3Components.js"></script>
 <script src="./connectWallet.js"></script>
 <script src="./min.ethers.js"></script>
+<script src="./bidsMade.js"></script>
+<script src="./allAuctions.js"></script>
 
 <script type="text/javascript">
 
+  const ETHUSD = 1566.61
 
-  const auctions = [
-    { title: '$0.00', auctionId: 16 + 0, url: './auctions/0', img: './assets/0.jpg' },
-    { title: '$0.01', auctionId: 16 + 1, url: './auctions/1', img: './assets/1.jpg' },
-    { title: '$0.05', auctionId: 16 + 2, url: './auctions/2', img: './assets/2.jpg' },
-    { title: '$0.10', auctionId: 16 + 3, url: './auctions/3', img: './assets/3.jpg' },
-    { title: '$0.25', auctionId: 16 + 4, url: './auctions/4', img: './assets/4.jpg' },
-    { title: '$0.50', auctionId: 16 + 5, url: './auctions/5', img: './assets/5.jpg' },
-    { title: '$1.00', auctionId: 16 + 6, url: './auctions/6', img: './assets/6.jpg' },
-    { title: '$2.00', auctionId: 16 + 7, url: './auctions/7', img: './assets/7.jpg' },
-    { title: '$5.00', auctionId: 16 + 8, url: './auctions/8', img: './assets/8.jpg' },
-    { title: '$6.67', auctionId: 16 + 9, url: './auctions/9', img: './assets/9.jpg' },
-    { title: '$10.00', auctionId: 16 + 10, url: './auctions/10', img: './assets/10.jpg' },
-    { title: '$20.00', auctionId: 16 + 11, url: './auctions/11', img: './assets/11.jpg' },
-    { title: '$50.00', auctionId: 16 + 12, url: './auctions/12', img: './assets/12.jpg' },
-    { title: '$50.32', auctionId: 16 + 13, url: './auctions/13', img: './assets/13.jpg' },
-    { title: '$100.00', auctionId: 16 + 14, url: './auctions/14', img: './assets/14.jpg' },
-    { title: '$???.??', auctionId: 16 + 15, url: './auctions/15', img: './assets/15.jpg' },
-  ]
+
+  const auctions = ALL_AUCTIONS
 
 
   const auctionMap = {
@@ -503,6 +464,9 @@ ul#previousBidList {
 
   const bidStruct = `(uint128 amount, uint128 timestamp, address bidder)`
 
+  const cashABI = [
+    'function ownerOf(uint256) external view returns (address)'
+  ]
   const auctionABI = [
     'event BidMade(uint256 indexed auctionId, address indexed bidder, uint256 amount, uint256 timestamp)',
     'function auctionCount() external view returns (uint256)',
@@ -535,7 +499,7 @@ ul#previousBidList {
   const $connectedBalance = $.id('connectedBalance')
   const $connectedNetwork = $.id('connectedNetwork')
   const $etherscanLink = $.id('etherscanLink')
-  const $wantsNotifications = $.id('wantsNotifications')
+  // const $wantsNotifications = $.id('wantsNotifications')
   const $bidHistory = $.id('bidHistory')
   const $previousBidList = $.id('previousBidList')
 
@@ -545,8 +509,8 @@ ul#previousBidList {
 
 
   $grid.innerHTML = auctions
-  .map(a => `
-    <div class="auctionPanel" id="auctionPanel-${a.auctionId}">
+  .map((a, i) => `
+    <div class="auctionPanel" id="auctionPanel-${a.auctionId}" style="${i === auctions.length - 1 ? 'grid-column-start: 2;' : ''}">
       <a href="${a.url}">
         <img src="${a.img}">
         <div style="height: 0">
@@ -554,6 +518,7 @@ ul#previousBidList {
             <h3>${a.title}</h3>
             <h3 class="auctionInfo" id="timeLeft-${a.auctionId}"></h3>
             <h3 class="auctionInfo" id="highestBid-${a.auctionId}"></h3>
+            <h3 class="auctionInfo" id="reservePrice-${a.auctionId}"></h3>
             <h3 class="auctionInfo" id="highestBidder-${a.auctionId}"></h3>
           </div>
         </div>
@@ -564,184 +529,42 @@ ul#previousBidList {
 
   let notificationPermission
 
-  if ($wantsNotifications) $wantsNotifications.onclick = () => {
-    if ($wantsNotifications.checked) {
-      notificationPermission = Notification.requestPermission()
-    } else {
-      notificationPermission = false
-    }
-  }
+  // if ($wantsNotifications) $wantsNotifications.onclick = () => {
+  //   if ($wantsNotifications.checked) {
+  //     notificationPermission = Notification.requestPermission()
+  //   } else {
+  //     notificationPermission = false
+  //   }
+  // }
 
+
+
+  for (let a of auctions) {
+
+    const $highestBid = $.id(`highestBid-${a.auctionId}`)
+    const $timeLeft = $.id(`timeLeft-${a.auctionId}`)
+    const $highestBidder = $.id(`highestBidder-${a.auctionId}`)
+    const $reservePrice = $.id(`reservePrice-${a.auctionId}`)
+
+
+
+    $highestBidder.innerHTML = `Winner: <a href="https://${etherscanPrefix}etherscan.io/address/${a.highestBidderAddr}" target="_blank" class="address">${a.highestBidder}</a>`
+
+
+    $reservePrice.innerHTML = `Reserve: ${a.reservePrice.toFixed(8)} ETH (~$${(a.reservePrice * ETHUSD).toFixed(2)})`
+    $highestBid.innerHTML = `Sold for: ${a.bidAmount} ETH (~$${(a.bidAmount * ETHUSD).toFixed(2)})`
+
+  }
 
 
   const activeCountdownIntervals = {}
   const recentBidMap = {}
 
-  async function updateBidInfo(signer, steviepAuction, uniswapV2) {
-    const signerAddr = await signer.getAddress()
-
-    const [
-      connectedNetwork,
-      connectedBalance,
-      formattedAddr
-    ] = await Promise.all([
-      provider.getNetwork(),
-      provider.getETHBalance(signerAddr),
-      formatAddr(signerAddr, provider),
-    ])
-
-    let networkName, networkDescriptor
-    if (connectedNetwork.name && connectedNetwork.name !== 'unknown') {
-      networkName = connectedNetwork.chainId === 1 ? 'mainnet' : connectedNetwork.name
-      networkDescriptor = 'Network'
-    } else {
-      networkName = connectedNetwork.chainId
-      networkDescriptor = 'Network ID'
-    }
-
-    $connectedNetwork.innerHTML = `${networkDescriptor}: ${networkName}`
-
-    $connectedAs.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${signerAddr}" target="_blank" class="address">${
-      isENS(formattedAddr) ? formattedAddr : await formatAddr(signerAddr, provider)
-    }</a>`
-    $connectedBalance.innerHTML = `Balance: ${ethVal(connectedBalance)} ETH`
-
-
-    const [
-      blockNumber,
-      ethUsd
-    ] = await Promise.all([
-      provider.provider.getBlockNumber(),
-      getEthUsd(uniswapV2)
-
-    ]).catch(e => console.log(e))
-
-    const block = await provider.provider.getBlock(blockNumber)
-    const timeDiff = Date.now() - block.timestamp*1000
-
-    const timeLeftList = []
-
-    for (let a of auctions) {
-      const [
-        highestBid,
-        auction,
-        auctionEndTime,
-        isActive,
-      ] = await Promise.all([
-        steviepAuction.auctionIdToHighestBid(a.auctionId),
-        steviepAuction.auctionIdToAuction(a.auctionId),
-        steviepAuction.auctionEndTime(a.auctionId),
-        steviepAuction.isActive(a.auctionId),
-      ])
-
-      const reservePrice = ethVal(auction.minBid)
-      const hasBid = !!bnToN(highestBid.timestamp)
-
-      const bidAmount = ethVal(highestBid.amount)
-      const timeLeft = Math.max(bnToN(auctionEndTime)*1000 - Date.now(), 0)
-
-      const endingSoon = timeLeft < auction.bidTimeExtension*1000 && timeLeft > 0 && isActive
-
-      timeLeftList.push({timeLeft, endingSoon, isActive, auctionId: a.auctionId})
-
-      const $highestBid = $.id(`highestBid-${a.auctionId}`)
-      const $timeLeft = $.id(`timeLeft-${a.auctionId}`)
-      const $highestBidder = $.id(`highestBidder-${a.auctionId}`)
-
-      if (!bidAmount) {
-        $highestBid.innerHTML = `Reserve: ${reservePrice} ETH (~$${(reservePrice * ethUsd).toFixed(2)})`
-      } else if (isActive) {
-        $highestBid.innerHTML = `Highest Bid: ${bidAmount} ETH (~$${(bidAmount * ethUsd).toFixed(2)})` + (endingSoon ? ' [ENDING SOON]' : '')
-        if (activeCountdownIntervals[a.auctionId]) activeCountdownIntervals[a.auctionId]()
-
-        $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, true, 31)}</a>`
-
-      // `Reserve: ${reservePrice} ETH (~$${(reservePrice * ethUsd).toFixed(2)})`
-
-        activeCountdownIntervals[a.auctionId] = triggerTimer(timeLeft, $timeLeft)
-
-
-        if (!recentBidMap[a.auctionId]) {
-          recentBidMap[a.auctionId] = bidAmount
-        } else if (notificationPermission && (bidAmount !== recentBidMap[a.auctionId])) {
-          recentBidMap[a.auctionId] = bidAmount
-
-          notificationPermission.then(p => {
-            const notification = new Notification(`💵 New Cold Hard Cash Bid 💵`, {
-              body: `${a.title} → ${bidAmount} ETH`,
-              icon: a.img,
-              requireInteraction: true
-            })
-          })
-        } else if (bidAmount !== recentBidMap[a.auctionId]) {
-          recentBidMap[a.auctionId] = bidAmount
-        }
-
-      } else {
-        $highestBid.innerHTML = `Sold for: ${bidAmount} ETH (~$${(bidAmount * ethUsd).toFixed(2)})`
-        $highestBidder.innerHTML = `<a href="https://${etherscanPrefix}etherscan.io/address/${highestBid.bidder}" target="_blank" class="address">${await formatAddr(highestBid.bidder, provider, true, 31)}</a>`
-      }
-    }
-
-    const auctionsBidOn = ls.get('__AUCTIONS_BID_ON__') || {}
-
-    timeLeftList
-      .sort((a, b) => {
-        if (b.endingSoon && !a.endingSoon) return 1
-        if (a.endingSoon && !b.endingSoon) return -1
-        // if (a.isActive && !b.isActive) return -1
-        // if (b.isActive && !a.isActive) return 1
-        // if (!a.isActive && !b.isActive) return 0
-        // if (!a.isActive && auctionsBidOn[b.auctionId]) return 1
-        // if (!b.isActive && auctionsBidOn[a.auctionId]) return -1
-        // if (a.timeLeft && !b.timeLeft) return -1
-        // if (!a.timeLeft && b.timeLeft) return 1
-        // if (a.timeLeft && b.timeLeft) {
-        //   return a.timeLeft - b.timeLeft
-        // }
-        return 0
-      })
-      .forEach((auction, i) => {
-        const panel = $.id(`auctionPanel-${auction.auctionId}`)
-        $(panel, 'order', i)
-        if (i === timeLeftList.length-1) {
-          $(panel, 'grid-column-start', '2')
-        }
-
-        if (auction.endingSoon) panel.classList.add('endingSoon')
-      })
-
-
-    $lastUpdated.innerHTML = `Local timestamp: ${new Date()} <br>Block timestamp: ${new Date(block.timestamp*1000)}<br>[Block: ${blockNumber}]<br><strong><a href="https://${etherscanPrefix}etherscan.io/address/${STEVIEP_AUCTION}" target="_blank" rel="nofollow" style="font-family:monospace">AUCTION CONTRACT</a></strong>`
-
-
-
-
-    try {
-      const bidFilter = steviepAuction.filters.BidMade()
-
-      const unsortedBidsMade = await steviepAuction.queryFilter(bidFilter).then(rawBids =>
-        Promise.all(
-          rawBids.map(
-            async e => ({
-              bidder: e.args.bidder,
-              bidderDisplay: await formatAddr(e.args.bidder, provider),
-              amount: ethVal(e.args.amount),
-              auctionId: bnToN(e.args.auctionId),
-              timestamp: bnToN(e.args.timestamp),
-            })
-          )
-        )
-      )
-
-      const bidsMade = unsortedBidsMade.sort((a,b) => b.timestamp - a.timestamp)
-
-      if (bidsMade.length) {
-        $previousBidList.innerHTML = bidsMade
+        $previousBidList.innerHTML = ALL_BIDS_MADE
         .filter(bid => bid.auctionId >= 16 && bid.auctionId < 32)
         .map(bid => {
           const bidAmount = Number(bid.amount.toFixed(14))
-          const bidAmountUSD = (bidAmount * ethUsd).toFixed(2)
+          const bidAmountUSD = (bidAmount * ETHUSD).toFixed(2)
           const bidAmountPretty = String(bidAmount).includes('.') ? bidAmount : bidAmount.toFixed(1)
           return `
             <li class="bidHistoryItem">
@@ -749,28 +572,13 @@ ul#previousBidList {
                 <strong>${auctionMap[bid.auctionId]}</strong>
                 <div>${bidAmountPretty} ETH (~$${bidAmountUSD})</div>
                 <div>
-                  <a href="https://${etherscanPrefix}etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
+                  <a href="https://etherscan.io/address/${bid.bidder}" target="_blank" class="address">${bid.bidderDisplay}</a>
                 </div>
               </div>
               <div>${new Date(bid.timestamp * 1000)}</div>
             </li>
           `
         }).join('')
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  provider.onConnect(async () => {
-    const steviepAuction = await provider.contract(STEVIEP_AUCTION, auctionABI)
-    const uniswapV2 = await provider.contract(UNISWAP_V2, uniswapV2ABI)
-    const rawSteviepAuction = provider.rawContract(STEVIEP_AUCTION, auctionABI)
-
-    setRunInterval(() => updateBidInfo(provider.signer, steviepAuction, uniswapV2), 3000)
-
-  })
-
 
 
 
@@ -804,6 +612,8 @@ ul#previousBidList {
       return truncate ? truncateAddr(addr) : addr
     }
   }
+
+
 
 
   function unhide(element) {

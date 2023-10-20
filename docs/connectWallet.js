@@ -1,7 +1,7 @@
 
 // const connectWalletTemplate = `
 //   <section>
-//   <h1>hello</h1>
+//   <h1>hello</h1><div id="osLink"></div>
 //     <section id="case-noWeb3" style="display: none;">
 //       <slot name="noWeb3"></slot>
 //     </section>
