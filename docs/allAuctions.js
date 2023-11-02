@@ -8,7 +8,7 @@ const ALL_AUCTIONS = [
     "bidAmount": 0.136,
     "highestBidder": "mymilkshakebringsalltheboyst...",
     "highestBidderAddr": "0xd50989DFD8CAa458c2D4D0085Dc5e976E6531A79",
-    "redeemed": false
+    "redeemed": true
   },
   {
     "title": "$0.01",
@@ -19,7 +19,7 @@ const ALL_AUCTIONS = [
     "bidAmount": 0.103,
     "highestBidder": "burner.0xfff.eth",
     "highestBidderAddr": "0xFFF5086e00bc92EE04826B0F5398EBBdB8ea4000",
-    "redeemed": false
+    "redeemed": true
   },
   {
     "title": "$0.05",
@@ -30,7 +30,7 @@ const ALL_AUCTIONS = [
     "bidAmount": 0.086,
     "highestBidder": "burner.0xfff.eth",
     "highestBidderAddr": "0xFFF5086e00bc92EE04826B0F5398EBBdB8ea4000",
-    "redeemed": false
+    "redeemed": true
   },
   {
     "title": "$0.10",
@@ -41,7 +41,7 @@ const ALL_AUCTIONS = [
     "bidAmount": 0.1,
     "highestBidder": "abcdnft.eth",
     "highestBidderAddr": "0x0e63d7E489363028E23a6da417D5767F9E399246",
-    "redeemed": false
+    "redeemed": true
   },
   {
     "title": "$0.25",
@@ -85,7 +85,7 @@ const ALL_AUCTIONS = [
     "bidAmount": 0.226,
     "highestBidder": "0xCfc9...6C13",
     "highestBidderAddr": "0xCfc96f5249D43DEB404bb428861B151C93a16C13",
-    "redeemed": false
+    "redeemed": true
   },
   {
     "title": "$5.00",
@@ -118,7 +118,7 @@ const ALL_AUCTIONS = [
     "bidAmount": 0.072,
     "highestBidder": "mal1.eth",
     "highestBidderAddr": "0x7E5507281F62C0f8d666beAEA212751cD88994b8",
-    "redeemed": false
+    "redeemed": true
   },
   {
     "title": "$20.00",
@@ -129,7 +129,7 @@ const ALL_AUCTIONS = [
     "bidAmount": 0.126,
     "highestBidder": "0x45a2...9Fe7",
     "highestBidderAddr": "0x45a2053B72564772DcD50d15658225c495499Fe7",
-    "redeemed": false
+    "redeemed": true
   },
   {
     "title": "$50.00",
@@ -173,6 +173,6 @@ const ALL_AUCTIONS = [
     "bidAmount": 0.184,
     "highestBidder": "gmistudio.eth",
     "highestBidderAddr": "0xb1A7D310751FD7bAd3434C9b345ddb45f5f5c688",
-    "redeemed": false
+    "redeemed": true
   }
 ]
