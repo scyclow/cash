@@ -188,7 +188,7 @@
       background: #fff;
       display: inline-block;
       transform: translate(1px, calc(-100% - 5px));
-      padding: 0.5em;
+      padding: 0.25em 0.5em;
       opacity: 0.7;
     }
 
@@ -520,6 +520,7 @@ ul#previousBidList {
             <h3 class="auctionInfo" id="highestBid-${a.auctionId}"></h3>
             <h3 class="auctionInfo" id="reservePrice-${a.auctionId}"></h3>
             <h3 class="auctionInfo" id="highestBidder-${a.auctionId}"></h3>
+            <h3 class="auctionInfo" id="isRedeemed-${a.auctionId}"></h3>
           </div>
         </div>
       </a>
@@ -544,6 +545,7 @@ ul#previousBidList {
     const $highestBid = $.id(`highestBid-${a.auctionId}`)
     const $timeLeft = $.id(`timeLeft-${a.auctionId}`)
     const $highestBidder = $.id(`highestBidder-${a.auctionId}`)
+    const $isRedeemed = $.id(`isRedeemed-${a.auctionId}`)
     const $reservePrice = $.id(`reservePrice-${a.auctionId}`)
 
 
@@ -553,7 +555,7 @@ ul#previousBidList {
 
     $reservePrice.innerHTML = `Reserve: ${a.reservePrice.toFixed(8)} ETH (~$${(a.reservePrice * ETHUSD).toFixed(2)})`
     $highestBid.innerHTML = `Sold for: ${a.bidAmount} ETH (~$${(a.bidAmount * ETHUSD).toFixed(2)})`
-
+    $isRedeemed.innerHTML = `Redeemed: ${a.redeemed}`
   }
 
 
