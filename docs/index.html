@@ -303,6 +303,18 @@ ul#previousBidList {
   padding: 1em;
 }
 
+.redeemed {
+  position: absolute;
+  padding: 0.5em;
+  background: #000;
+  color: #fff;
+  opacity: 0.8;
+}
+
+.hidden {
+  display: none;
+}
+
   </style>
 </head>
 
@@ -512,6 +524,7 @@ ul#previousBidList {
   .map((a, i) => `
     <div class="auctionPanel" id="auctionPanel-${a.auctionId}" style="${i === auctions.length - 1 ? 'grid-column-start: 2;' : ''}">
       <a href="${a.url}">
+        <h3 class="redeemed hidden" id="isRedeemed-${a.auctionId}">Redeemed</h3>
         <img src="${a.img}">
         <div style="height: 0">
           <div class="infoCard">
@@ -520,7 +533,6 @@ ul#previousBidList {
             <h3 class="auctionInfo" id="highestBid-${a.auctionId}"></h3>
             <h3 class="auctionInfo" id="reservePrice-${a.auctionId}"></h3>
             <h3 class="auctionInfo" id="highestBidder-${a.auctionId}"></h3>
-            <h3 class="auctionInfo" id="isRedeemed-${a.auctionId}"></h3>
           </div>
         </div>
       </a>
@@ -555,7 +567,9 @@ ul#previousBidList {
 
     $reservePrice.innerHTML = `Reserve: ${a.reservePrice.toFixed(8)} ETH (~$${(a.reservePrice * ETHUSD).toFixed(2)})`
     $highestBid.innerHTML = `Sold for: ${a.bidAmount} ETH (~$${(a.bidAmount * ETHUSD).toFixed(2)})`
-    $isRedeemed.innerHTML = `Redeemed: ${a.redeemed}`
+    if (a.redeemed) {
+      $isRedeemed.classList.remove('hidden')
+    }
   }
 
 
